@@ -1,0 +1,2060 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>5月GMV目标达成率追踪</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Microsoft YaHei",sans-serif;background:#f0f2f5;padding:20px;color:#333}
+.header{text-align:center;margin-bottom:20px}
+.header h1{font-size:26px;color:#1a1a1a}
+.header .date{color:#888;font-size:13px;margin-top:5px}
+.drop-zone{border:3px dashed #bbb;border-radius:12px;padding:35px;text-align:center;margin-bottom:20px;background:#fafafa;transition:all .3s;cursor:pointer}
+.drop-zone.dragover{border-color:#5470c6;background:#eef2ff;transform:scale(1.01)}
+.drop-zone p{font-size:16px;color:#555}
+.drop-zone .hint{font-size:12px;color:#999;margin-top:8px}
+.toolbar{display:flex;gap:10px;margin-bottom:18px;align-items:center;flex-wrap:wrap}
+.toolbar button{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;transition:background .2s}
+.btn-danger{background:#ff4d4f;color:#fff}.btn-danger:hover{background:#ff7875}
+.btn-info{background:#5470c6;color:#fff}.btn-info:hover{background:#7b9bd6}
+.history-info{font-size:13px;color:#666}
+.city-section{background:#fff;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.city-title{font-size:22px;font-weight:bold;color:#1a1a1a;margin-bottom:8px;border-left:4px solid #5470c6;padding-left:12px}
+.kpi-row{display:flex;gap:12px;margin:15px 0;flex-wrap:wrap}
+.kpi-card{flex:1;min-width:130px;border-radius:10px;padding:20px;text-align:center;color:#fff}
+.kpi-card .label{font-size:16px;opacity:1;font-weight:600}
+.kpi-card .value{font-size:34px;font-weight:bold;margin-top:8px}
+.kpi-purple{background:linear-gradient(135deg,#667eea,#764ba2)}
+.kpi-green{background:linear-gradient(135deg,#11998e,#38ef7d)}
+.kpi-orange{background:linear-gradient(135deg,#f093fb,#f5576c)}
+.kpi-blue{background:linear-gradient(135deg,#4facfe,#00f2fe)}
+.chart-box{height:580px;margin-top:10px}
+.chart-box-tall{height:820px;margin-top:10px}
+.path-section{margin-top:20px}
+.path-section h3{font-size:16px;margin-bottom:12px;color:#444}
+.summary-table{width:auto;border-collapse:collapse;margin-bottom:18px;font-size:13px;table-layout:auto}
+.summary-table th{background:#f5f7fa;padding:10px 12px;text-align:center;border:1px solid #e8e8e8;font-weight:600;color:#333;white-space:nowrap}
+.summary-table td{padding:9px 12px;text-align:center;border:1px solid #e8e8e8;white-space:nowrap}
+.summary-table tr:hover td{background:#fafbfc}
+.rate-good{color:#52c41a;font-weight:bold}
+.rate-warn{color:#faad14;font-weight:bold}
+.rate-bad{color:#ff4d4f;font-weight:bold}
+.path-charts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:16px}
+.path-chart-item{height:360px;background:#fafbfc;border-radius:8px;border:1px solid #eee}
+.path-block{background:#fafbfc;border-radius:10px;padding:18px 20px;margin:16px 0;border:1px solid #eee}
+.block-title{font-size:17px;font-weight:bold;color:#1a1a1a;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #e8e8e8}
+.toast{position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:8px;color:#fff;font-size:14px;z-index:9999;opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}.toast.success{background:#52c41a}.toast.error{background:#ff4d4f}.toast.info{background:#1890ff}
+.note{text-align:center;color:#999;font-size:12px;margin-top:24px}
+.tab-bar{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid #e8e8e8}
+.tab-btn{padding:10px 28px;border:none;background:none;cursor:pointer;font-size:15px;font-family:inherit;color:#666;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab-btn:hover{color:#5470c6}
+.tab-btn.active{color:#5470c6;font-weight:bold;border-bottom-color:#5470c6}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.analysis-box{background:#f8faff;border-left:4px solid #5470c6;border-radius:0 8px 8px 0;padding:14px 18px;margin:12px 0 18px 0;font-size:13px;line-height:1.8;color:#444}
+.analysis-box .analysis-title{font-weight:bold;color:#333;margin-bottom:6px;font-size:14px}
+.analysis-box .highlight-good{color:#52c41a;font-weight:bold}
+.analysis-box .highlight-warn{color:#faad14;font-weight:bold}
+.analysis-box .highlight-bad{color:#ff4d4f;font-weight:bold}
+.analysis-box .highlight-info{color:#5470c6;font-weight:bold}
+.analysis-box ul{margin:4px 0 0 18px;padding:0}
+.analysis-box li{margin-bottom:2px}
+.path-analysis-box{background:#fffbe6;border-left:4px solid #faad14;border-radius:0 8px 8px 0;padding:10px 14px;margin:8px 0 14px 0;font-size:12px;line-height:1.7;color:#555}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>📊 5月GMV目标达成率追踪</h1>
+  <div class="date" id="reportDate"></div>
+</div>
+<div class="drop-zone" id="dropZone">
+  <p>📂 将Excel文件拖拽到此处，或点击选择文件</p>
+  <div class="hint">支持 5月目标达成模板.xlsx（自动读取"达成率看板"sheet，自动识别城市）| 天气数据请用工具栏按钮单独上传</div>
+  <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none">
+</div>
+<div class="toolbar">
+  <span class="history-info" id="historyInfo">暂无历史数据</span>
+  <button class="btn-info" onclick="uploadWeather()">🌤️ 上传天气数据</button>
+  <input type="file" id="weatherInput" accept=".xlsx,.xls" style="display:none">
+  <span class="history-info" id="weatherInfo" style="color:#faad14"></span>
+  <button class="btn-info" onclick="exportCSV()">📥 导出CSV</button>
+  <button class="btn-info" onclick="downloadHTML()" style="background:#13c2c2">📄 下载当前页面</button>
+  <button class="btn-danger" onclick="clearHistory()">🗑️ 清空历史</button>
+  <button class="btn-danger" onclick="clearWeather()" style="background:#faad14">🌤️ 清空天气</button>
+</div>
+<div class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">总览</button>
+</div>
+<div id="tab-overview" class="tab-content active"></div>
+<div class="note">拖入Excel自动解析 | 数据保存在浏览器本地存储</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== 常量 ==========
+var MAY_DAYS = 31; // 默认值，会被数据自动覆盖
+var DATA_YEAR = 2026; // 默认年份，会被数据自动覆盖
+var DATA_MONTH = 5; // 默认月份，会被数据自动覆盖
+var STORAGE_KEY = 'gmv_may_history_v2';
+
+// 根据数据自动检测月份和天数，如果没有数据则使用当前月份
+function detectMonthFromData(history) {
+  var allDates = [];
+  // 如果CITIES为空，尝试从history中检测城市
+  if (CITIES.length === 0) {
+    Object.keys(history).forEach(function(key) {
+      if (key !== '合计' && key !== '_totalTargets' && typeof history[key] === 'object') {
+        // 检查是否是城市数据（包含日期key）
+        var keys = Object.keys(history[key]);
+        if (keys.length > 0 && /^\d{4}-\d{2}-\d{2}$/.test(keys[0])) {
+          CITIES.push(key);
+        }
+      }
+    });
+  }
+  var cityKeys = CITIES.length > 0 ? CITIES.concat(['合计']) : ['武汉', '长沙', '合肥', '合计'];
+  cityKeys.forEach(function(city) {
+    if (history[city]) {
+      Object.keys(history[city]).forEach(function(d) { allDates.push(d); });
+    }
+  });
+  
+  if (allDates.length > 0) {
+    // 有数据：从数据中提取月份（用最新日期，避免旧月份残留数据干扰）
+    allDates.sort();
+    var latestDate = allDates[allDates.length - 1];
+    var match = latestDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (match) {
+      DATA_YEAR = parseInt(match[1]);
+      DATA_MONTH = parseInt(match[2]);
+    }
+  } else {
+    // 没有数据：使用当前月份
+    var now = new Date();
+    DATA_YEAR = now.getFullYear();
+    DATA_MONTH = now.getMonth() + 1;
+  }
+  
+  // 计算该月有多少天
+  MAY_DAYS = new Date(DATA_YEAR, DATA_MONTH, 0).getDate();
+}
+
+// 生成当月所有日期的数组
+function generateAllDates() {
+  var allDates = [];
+  var prefix = DATA_YEAR + '-' + String(DATA_MONTH).padStart(2, '0') + '-';
+  for (var dy = 1; dy <= MAY_DAYS; dy++) {
+    allDates.push(prefix + String(dy).padStart(2, '0'));
+  }
+  return allDates;
+}
+
+// 节假日/休息日配置（法定假日手动配置，周末自动计算）
+var HOLIDAYS_MANUAL = {
+  // 4月: 清明节4/4-6（4/4六、4/5日本身是周末，4/6一调休）
+  4: { 6: '清明节' },
+  // 5月: 五一5/1-5（5/1四~5/5一）
+  5: { 1: '五一', 2: '五一', 3: '五一', 4: '五一', 5: '五一' },
+  // 6月: 端午节（待确认具体日期）
+  6: {}
+};
+function getHolidays() {
+  var manual = HOLIDAYS_MANUAL[DATA_MONTH] || {};
+  var result = {};
+  // 自动计算当月所有周末（周六、周日）
+  for (var d = 1; d <= MAY_DAYS; d++) {
+    var date = new Date(DATA_YEAR, DATA_MONTH - 1, d);
+    var dow = date.getDay(); // 0=周日, 6=周六
+    if (dow === 0 || dow === 6) {
+      result[d] = '周末';
+    }
+  }
+  // 手动配置的假日覆盖（优先级更高）
+  Object.keys(manual).forEach(function(k) { result[k] = manual[k]; });
+  return result;
+}
+function isHoliday(day) { return getHolidays()[day] != null; }
+function holidayLabel(day) { return getHolidays()[day] || ''; }
+
+// 五一地推专用时间进度计算
+// 五一地推只在五一假期期间进行（5月1日-5日），所以时间进度应基于假期天数
+function getWuyiTimeProg() {
+  var holidays = HOLIDAYS_MANUAL[5] || {};
+  var wuyiDays = Object.keys(holidays).map(Number).sort(function(a,b){return a-b;});
+  if (wuyiDays.length === 0 || DATA_MONTH !== 5) return null; // 非5月不适用
+  var totalWuyiDays = wuyiDays.length; // 五一假期总天数（5天）
+  var firstDay = wuyiDays[0]; // 假期第一天
+  var lastDay = wuyiDays[wuyiDays.length - 1]; // 假期最后一天
+
+  var yest = getYesterday();
+  var now = new Date();
+  var currentYear = now.getFullYear();
+  var currentMonth = now.getMonth() + 1;
+  var shouldCutoff = (DATA_MONTH === currentMonth && DATA_YEAR === currentYear);
+
+  if (!shouldCutoff) {
+    // 数据月份已过，五一地推时间进度100%
+    return 1;
+  }
+
+  var currentDay = yest.day; // T-1日
+  if (currentDay < firstDay) return 0; // 假期还没开始
+  if (currentDay >= lastDay) return 1; // 假期已结束
+  // 假期进行中：已过天数 / 总天数
+  var elapsed = currentDay - firstDay + 1;
+  return elapsed / totalWuyiDays;
+}
+
+// 获取渠道专属时间进度（五一地推使用特殊计算）
+function getChannelTimeProg(channelName, defaultTimeProg) {
+  if (channelName === '五一地推') {
+    var wuyiProg = getWuyiTimeProg();
+    if (wuyiProg !== null) return wuyiProg;
+  }
+  return defaultTimeProg;
+}
+
+var CITIES = []; // 动态检测，从Excel数据中自动识别城市
+
+// 达成率看板中每个城市的数据区域（行号，1-indexed）- 动态检测
+var CITY_SECTION = {};
+
+// 自动检测表头行位置和城市列表（在parseExcel中动态覆盖CITY_SECTION）
+function detectCitySections(rows) {
+  // 查找所有城市标记行（如【武汉】、【合肥】、【合计】）
+  var cityMarkers = [];
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    if (!row || !row[0]) continue;
+    var cellVal = String(row[0]).trim();
+    var match = cellVal.match(/^【(.+?)】$/);
+    if (match) {
+      cityMarkers.push({ name: match[1], row: i + 1 }); // 1-indexed
+    }
+  }
+  
+  // 根据城市标记确定数据区域
+  CITIES = [];
+  CITY_SECTION = {};
+  cityMarkers.forEach(function(marker) {
+    var cityName = marker.name;
+    // 查找该标记后面的表头行（"日期"行）
+    var headerRow = -1;
+    for (var j = marker.row; j < Math.min(marker.row + 3, rows.length); j++) {
+      var r = rows[j]; // 0-indexed
+      if (r && String(r[0] || '').trim() === '日期') {
+        headerRow = j + 1; // 转为1-indexed
+        break;
+      }
+    }
+    if (headerRow < 0) return;
+    
+    CITY_SECTION[cityName] = { headerRow: headerRow, dataStart: headerRow + 1, dataEnd: headerRow + 31 };
+    if (cityName !== '合计') {
+      CITIES.push(cityName);
+    }
+  });
+  
+  // 如果没有检测到城市标记，尝试旧的方式（查找"日期"表头行）
+  if (CITIES.length === 0) {
+    var headerRows = [];
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      if (row && String(row[0] || '').trim() === '日期' && String(row[1] || '').indexOf('时间进度') >= 0) {
+        headerRows.push(i + 1); // 转为1-indexed
+      }
+    }
+    if (headerRows.length >= 3) {
+      // 旧格式：武汉、长沙、合肥、合计
+      var defaultCities = ['武汉', '长沙', '合肥', '合计'];
+      for (var ci = 0; ci < headerRows.length && ci < defaultCities.length; ci++) {
+        var hr = headerRows[ci];
+        CITY_SECTION[defaultCities[ci]] = { headerRow: hr, dataStart: hr + 1, dataEnd: hr + 31 };
+        if (defaultCities[ci] !== '合计') CITIES.push(defaultCities[ci]);
+      }
+    } else if (headerRows.length >= 2) {
+      // 2个城市 + 合计
+      var defaultCities2 = ['武汉', '合肥', '合计'];
+      for (var ci = 0; ci < headerRows.length && ci < defaultCities2.length; ci++) {
+        var hr = headerRows[ci];
+        CITY_SECTION[defaultCities2[ci]] = { headerRow: hr, dataStart: hr + 1, dataEnd: hr + 31 };
+        if (defaultCities2[ci] !== '合计') CITIES.push(defaultCities2[ci]);
+      }
+    }
+  }
+}
+
+// 自动检测列映射（根据表头行内容动态更新CHANNEL_COLS）
+function detectChannelCols(headerRow) {
+  // 渠道名到CHANNEL_COLS key的映射（处理重名情况：第一个"端内"是站点端内，第二个是门店端内）
+  var colMapping = {};
+  var duanneiCount = 0;
+  for (var ci = 2; ci < headerRow.length; ci++) {
+    var val = String(headerRow[ci] || '').trim();
+    if (!val || val === '目标' || val === '完成率') continue;
+    
+    if (val === '端内') {
+      duanneiCount++;
+      if (duanneiCount === 1) {
+        colMapping['端内'] = ci;
+      } else if (duanneiCount === 2) {
+        colMapping['门店端内'] = ci;
+      }
+    } else if (val === '站点合计') { colMapping['站点合计'] = ci; }
+    else if (val === '五一地推') { colMapping['五一地推'] = ci; }
+    else if (val === '周末地推') { colMapping['周末地推'] = ci; }
+    else if (val === '上翻') { colMapping['上翻'] = ci; }
+    else if (val === '收钱吧') { colMapping['收钱吧'] = ci; }
+    else if (val === '门店合计') { colMapping['门店合计'] = ci; }
+    else if (val === '渠道拓展合计') { colMapping['渠道拓展合计'] = ci; }
+    else if (val === '美团有人门店') { colMapping['美团有人门店'] = ci; }
+    else if (val === '美团无人点位') { colMapping['美团无人点位'] = ci; }
+    else if (val === '新开门店') { colMapping['新开门店'] = ci; }
+    else if (val === '抖音') { colMapping['抖音'] = ci; }
+    else if (val === '美团抖音合计') { colMapping['美团抖音合计'] = ci; }
+    else if (val === '闲鱼') { colMapping['闲鱼'] = ci; }
+    else if (val === '小红书') { colMapping['小红书'] = ci; }
+    else if (val === '新媒体合计') { colMapping['新媒体合计'] = ci; }
+    else if (val === '续租') { colMapping['续租'] = ci; }
+    else if (val === '现有的分销人') { colMapping['现有的分销人'] = ci; }
+    else if (val === '私域推广') { colMapping['私域推广'] = ci; }
+    else if (val === '私域合计') { colMapping['私域合计'] = ci; }
+  }
+  
+  // 更新CHANNEL_COLS
+  Object.keys(colMapping).forEach(function(key) {
+    CHANNEL_COLS[key] = { col: colMapping[key] };
+  });
+  
+  // 如果没有检测到收钱吧，从CHANNEL_COLS中移除它
+  if (!colMapping['收钱吧']) {
+    delete CHANNEL_COLS['收钱吧'];
+    // 同时从BLOCK_CONFIG的门店paths中移除
+    BLOCK_CONFIG.forEach(function(block) {
+      if (block.name === '门店（线下）') {
+        block.paths = block.paths.filter(function(p) { return p !== '收钱吧'; });
+      }
+    });
+  } else {
+    // 确保收钱吧在门店的paths中
+    BLOCK_CONFIG.forEach(function(block) {
+      if (block.name === '门店（线下）' && block.paths.indexOf('收钱吧') < 0) {
+        block.paths.push('收钱吧');
+      }
+    });
+  }
+  
+  // 更新ALL_CHANNELS
+  ALL_CHANNELS = Object.keys(CHANNEL_COLS);
+}
+
+// 达成率看板列映射（0-indexed from header row）
+// 每个渠道占3列：累计值, 目标, 完成率
+// Col layout (0-indexed):
+// 0:日期, 1:时间进度
+// 2-4: 端内[站点], 5-7: 五一地推, 8-10: 周末地推, 11-13: 站点合计
+// 14-16: 端内[门店], 17-19: 上翻, 20-22: 收钱吧, 23-25: 门店合计
+// 26-28: 渠道拓展合计
+// 29-31: 美团有人门店, 32-34: 美团无人点位, 35-37: 新开门店, 38-40: 抖音, 41-43: 美团抖音合计
+// 44-46: 闲鱼, 47-49: 小红书, 50-52: 新媒体合计
+// 53-55: 续租, 56-58: 现有的分销人, 59-61: 私域推广, 62-64: 私域合计
+
+var CHANNEL_COLS = {
+  '端内':       { col: 2 },
+  '五一地推':   { col: 5 },
+  '周末地推':   { col: 8 },
+  '站点合计':   { col: 11 },
+  '门店端内':   { col: 14 },
+  '上翻':       { col: 17 },
+  '收钱吧':   { col: 20 },
+  '门店合计':   { col: 23 },
+  '渠道拓展合计': { col: 26 },
+  '美团有人门店': { col: 29 },
+  '美团无人点位': { col: 32 },
+  '新开门店':   { col: 35 },
+  '抖音':       { col: 38 },
+  '美团抖音合计': { col: 41 },
+  '闲鱼':       { col: 44 },
+  '小红书':     { col: 47 },
+  '新媒体合计': { col: 50 },
+  '续租':       { col: 53 },
+  '现有的分销人': { col: 56 },
+  '私域推广':   { col: 59 },
+  '私域合计':   { col: 62 }
+};
+
+// 渠道大类分组
+var BLOCK_CONFIG = [
+  { name: '站点', icon: '📦', paths: ['端内', '五一地推', '周末地推'], totalPath: '站点合计' },
+  { name: '门店（线下）', icon: '🏪', paths: ['门店端内', '上翻', '收钱吧'], totalPath: '门店合计', displayTotalPath: '门店（线下）合计' },
+  { name: '渠道拓展', icon: '🔗', paths: [], totalPath: '渠道拓展合计' },
+  { name: '美团抖音', icon: '📱', paths: ['美团有人门店', '美团无人点位', '新开门店', '抖音'], totalPath: '美团抖音合计', displayPaths: { '美团有人门店': '美团有人门店（包含新开门店）' } },
+  { name: '新媒体', icon: '📢', paths: ['闲鱼', '小红书'], totalPath: '新媒体合计' },
+  { name: '私域', icon: '🤝', paths: ['续租', '现有的分销人', '私域推广'], totalPath: '私域合计' }
+];
+
+// 所有渠道名（用于汇总）
+var ALL_CHANNELS = Object.keys(CHANNEL_COLS);
+
+// ========== 工具函数 ==========
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + type;
+  setTimeout(function() { t.className = 'toast'; }, 3000);
+}
+function loadHistory() { var r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : {}; }
+function saveHistory(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+function clearHistory() { if (!confirm('确定清空所有历史数据？')) return; localStorage.removeItem(STORAGE_KEY); showToast('历史数据已清空', 'info'); renderAll(); }
+function numVal(v) { if (v == null || v === '' || v === '—') return null; var n = Number(v); return isNaN(n) ? null : n; }
+function rateVal(v) {
+  if (v == null || v === '' || v === '—') return null;
+  if (typeof v === 'number') return v;
+  var s = String(v).replace(/[%％]/g, '').trim();
+  if (s === '—' || s === '') return null;
+  var n = Number(s);
+  if (isNaN(n)) return null;
+  return n / 100;
+}
+function fmtRate(v) { if (v == null) return '-'; return (v * 100).toFixed(1) + '%'; }
+function rateClass(rate, timeProg) {
+  if (rate == null) return '';
+  var r = rate * 100, t = (timeProg || 0) * 100;
+  if (r >= t) return 'rate-good';
+  if (r >= t * 0.8) return 'rate-warn';
+  return 'rate-bad';
+}
+
+// ========== 天气数据 ==========
+var WEATHER_KEY = 'gmv_may_weather';
+function loadWeather() { var r = localStorage.getItem(WEATHER_KEY); return r ? JSON.parse(r) : {}; }
+function saveWeather(d) { localStorage.setItem(WEATHER_KEY, JSON.stringify(d)); }
+function clearWeather() { if (!confirm('确定清空天气数据？')) return; localStorage.removeItem(WEATHER_KEY); showToast('天气数据已清空', 'info'); renderAll(); }
+function uploadWeather() { document.getElementById('weatherInput').click(); }
+
+function weatherIcon(text) {
+  if (!text) return '';
+  if (/暴雨/.test(text)) return '⛈';
+  if (/大雨/.test(text)) return '🌧';
+  if (/中雨/.test(text)) return '🌧';
+  if (/阵雨/.test(text)) return '🌦';
+  if (/小雨/.test(text)) return '🌦';
+  if (/雨/.test(text)) return '🌧';
+  if (/雾/.test(text)) return '🌫';
+  if (/阴/.test(text)) return '☁';
+  if (/多云/.test(text)) return '⛅';
+  if (/晴/.test(text)) return '☀';
+  return '';
+}
+
+function getWeatherLabel(city, day) {
+  var weather = loadWeather();
+  if (city === '总览') return '';
+  var w = weather[city];
+  if (!w || !w[day]) return '';
+  return simplifyWeather(w[day]);
+}
+
+// 判断天气是否为雨天
+function isRainyWeather(text) {
+  if (!text) return false;
+  return /雨|雷/.test(text);
+}
+
+// 简化天气文字：取好的天气情况
+function simplifyWeather(text) {
+  if (!text) return '';
+  // 如果包含"转"，取好的那种天气
+  if (text.indexOf('转') >= 0) {
+    var parts = text.split('转');
+    // 天气优先级：晴 > 多云 > 阴 > 小雨 > 中雨 > 大雨 > 暴雨
+    var priority = ['晴', '多云', '阴', '小雨', '阵雨', '中雨', '大雨', '暴雨', '雷阵雨', '雪'];
+    var bestIdx = 999;
+    var bestText = parts[0].trim();
+    parts.forEach(function(p) {
+      var pt = p.trim();
+      for (var i = 0; i < priority.length; i++) {
+        if (pt.indexOf(priority[i]) >= 0) {
+          if (i < bestIdx) { bestIdx = i; bestText = priority[i]; }
+          break;
+        }
+      }
+    });
+    return bestText;
+  }
+  // 没有"转"，直接取主要天气词
+  var keywords = ['晴', '多云', '阴', '小雨', '阵雨', '中雨', '大雨', '暴雨', '雷阵雨', '雪', '雾'];
+  for (var i = 0; i < keywords.length; i++) {
+    if (text.indexOf(keywords[i]) >= 0) return keywords[i];
+  }
+  return text;
+}
+
+function getWeatherText(city, day) {
+  var weather = loadWeather();
+  if (city === '总览') return '';
+  var w = weather[city];
+  if (!w || !w[day]) return '';
+  return w[day];
+}
+
+function parseWeatherExcel(buf) {
+  var wb = XLSX.read(buf, { type: 'array', cellDates: true });
+  var sn = wb.SheetNames[0];
+  var rows = XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, defval: null, raw: false });
+  if (rows.length < 2) return null;
+
+  // 第一行是表头：空, 武汉, 长沙, 合肥
+  var header = rows[0];
+  var cityMap = {};
+  for (var ci = 1; ci < header.length; ci++) {
+    var cName = String(header[ci] || '').trim();
+    if (cName) cityMap[ci] = cName;
+  }
+
+  var result = {};
+  Object.values(cityMap).forEach(function(c) { result[c] = {}; });
+
+  for (var ri = 1; ri < rows.length; ri++) {
+    var row = rows[ri];
+    if (!row || !row[0]) continue;
+    var dateVal = row[0];
+    var day = null;
+
+    // 尝试解析日期
+    if (typeof dateVal === 'number') {
+      // Excel serial number: 基准日1900-01-01=1, 但JS Date epoch不同
+      // 用XLSX的日期解析
+      var d = new Date((dateVal - 25569) * 86400 * 1000);
+      day = d.getDate();
+    } else {
+      var ds = String(dateVal);
+      // 尝试 "4/1" 格式
+      var m1 = ds.match(/(\d{1,2})\/(\d{1,2})/);
+      if (m1) { day = parseInt(m1[2]); }
+      else {
+        // 尝试 "2026-05-01" 或 "05-01" 格式
+        var m2 = ds.match(/(\d{1,2})-(\d{1,2})$/);
+        if (m2) { day = parseInt(m2[2]); }
+        else {
+          // 尝试日期字符串 "Mon Apr 01 2026..."
+          var pd = new Date(ds);
+          if (!isNaN(pd.getTime())) { day = pd.getDate(); }
+        }
+      }
+    }
+
+    if (day == null || day < 1 || day > 31) continue;
+
+    Object.keys(cityMap).forEach(function(colIdx) {
+      var cName = cityMap[colIdx];
+      var wText = row[colIdx];
+      if (wText && String(wText).trim()) {
+        result[cName][day] = String(wText).trim();
+      }
+    });
+  }
+
+  return result;
+}
+
+function handleWeatherFile(file) {
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var result = parseWeatherExcel(e.target.result);
+      if (!result) { showToast('天气数据解析失败', 'error'); return; }
+      // 合并已有天气数据
+      var existing = loadWeather();
+      Object.keys(result).forEach(function(city) {
+        if (!existing[city]) existing[city] = {};
+        Object.keys(result[city]).forEach(function(day) {
+          existing[city][day] = result[city][day];
+        });
+      });
+      saveWeather(existing);
+      var totalDays = 0;
+      Object.keys(result).forEach(function(city) { totalDays = Math.max(totalDays, Object.keys(result[city]).length); });
+      showToast('🌤️ 天气数据导入成功！共 ' + totalDays + ' 天', 'success');
+      renderAll();
+    } catch (err) { showToast('天气解析失败: ' + err.message, 'error'); console.error(err); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// 绑定天气文件上传
+document.getElementById('weatherInput').addEventListener('change', function(e) {
+  handleWeatherFile(e.target.files[0]);
+  e.target.value = '';
+});
+
+function exportCSV() {
+  var history = loadHistory();
+  if (!Object.keys(history).length) { showToast('没有数据可导出', 'error'); return; }
+  var cols = ['日期','城市','渠道','累计值','目标','完成率'];
+  var csv = '\uFEFF' + cols.join(',') + '\n';
+  CITIES.concat(['合计']).forEach(function(city) {
+    var cityData = history[city];
+    if (!cityData) return;
+    Object.keys(cityData).sort().forEach(function(date) {
+      var dayData = cityData[date];
+      ALL_CHANNELS.forEach(function(ch) {
+        var d = dayData[ch];
+        if (d) csv += [date, city, ch, d.value||'', d.target||'', d.rate!=null?(d.rate*100).toFixed(1)+'%':''].join(',') + '\n';
+      });
+    });
+  });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = DATA_MONTH + '月GMV历史数据.csv'; a.click(); showToast('CSV已导出', 'success');
+}
+
+function downloadHTML() {
+  var html = document.documentElement.outerHTML;
+  var blob = new Blob(['<!DOCTYPE html>\n' + html], { type: 'text/html;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  var today = new Date();
+  var dateStr = today.getFullYear() + String(today.getMonth() + 1).padStart(2, '0') + String(today.getDate()).padStart(2, '0');
+  a.download = DATA_MONTH + '月GMV达成率报告_' + dateStr + '.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('页面已下载', 'success');
+}
+
+function getYesterday() {
+  var now = new Date();
+  var y = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+  // 使用当前月份的天数，而不是MAY_DAYS（MAY_DAYS会在detectMonthFromData中更新）
+  var currentMonthDays = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  return { day: y.getDate(), month: y.getMonth() + 1, daysInMonth: currentMonthDays };
+}
+
+// ========== Excel解析（读取"达成率看板"sheet） ==========
+function parseExcel(buf) {
+  var wb = XLSX.read(buf, { type: 'array' });
+  // 查找"达成率看板"sheet
+  var sheetName = null;
+  wb.SheetNames.forEach(function(sn) {
+    if (sn.indexOf('达成率看板') >= 0) sheetName = sn;
+  });
+  if (!sheetName) {
+    showToast('未找到"达成率看板"sheet', 'error');
+    return null;
+  }
+  var rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1, defval: null });
+  var result = {};
+
+  // 自动检测表头行位置
+  detectCitySections(rows);
+
+  // 自动检测列映射（根据第一个城市表头行的实际内容）
+  var firstCity = CITIES.length > 0 ? CITIES[0] : '武汉';
+  var headerRowIdx = CITY_SECTION[firstCity] ? CITY_SECTION[firstCity].headerRow - 1 : -1;
+  var headerRow = headerRowIdx >= 0 ? rows[headerRowIdx] : null;
+  if (headerRow) {
+    detectChannelCols(headerRow);
+  }
+
+  // 从月度目标设置区域读取"所有渠道合计"目标值
+  var totalTargets = {};
+  for (var ti = 0; ti < Math.min(rows.length, 100); ti++) {
+    var tRow = rows[ti];
+    if (tRow && String(tRow[0] || '').indexOf('所有渠道合计') >= 0) {
+      var tCity = String(tRow[2] || '').trim();
+      var tVal = numVal(tRow[3]);
+      if (tCity && tVal != null) {
+        totalTargets[tCity] = tVal;
+      }
+    }
+  }
+  result._totalTargets = totalTargets;
+
+  CITIES.concat(['合计']).forEach(function(city) {
+    if (!CITY_SECTION[city]) return; // 跳过不存在的城市
+    var sec = CITY_SECTION[city];
+    result[city] = {};
+    var prevRowKey = null; // 用于检测重复填充的数据
+    for (var ri = sec.dataStart - 1; ri <= sec.dataEnd - 1; ri++) {
+      var row = rows[ri];
+      if (!row) continue;
+      var dateStr = row[0];
+      if (!dateStr) continue;
+      // 日期格式: "5/1" -> "2026-05-01"  (自动识别月份，年份来自DATA_YEAR或当前年)
+      var dateMatch = String(dateStr).match(/^(\d{1,2})\/(\d{1,2})$/);
+      if (!dateMatch) continue;
+      var month = dateMatch[1].padStart(2, '0');
+      var day = dateMatch[2].padStart(2, '0');
+      // 优先用 DATA_YEAR；若还是默认值且与当前年不同，用当前年兜底
+      var yearForDate = DATA_YEAR || new Date().getFullYear();
+      var fullDate = yearForDate + '-' + month + '-' + day;
+      var timeProg = numVal(row[1]);
+
+      var dayData = { timeProg: timeProg };
+      // 生成当前行的数据指纹（用于去重）
+      var rowFingerprint = '';
+      Object.keys(CHANNEL_COLS).forEach(function(ch) {
+        var c = CHANNEL_COLS[ch].col;
+        var value = numVal(row[c]);
+        var target = numVal(row[c + 1]);
+        var rate = rateVal(row[c + 2]);
+        // 如果有目标和值，用实际值计算达成率
+        if (target != null && target > 0 && value != null) {
+          rate = value / target;
+        }
+        dayData[ch] = { value: value, target: target, rate: rate };
+        rowFingerprint += (value != null ? value.toFixed(2) : 'x') + '|';
+      });
+
+      // 跳过与前一天完全相同的重复填充数据
+      if (prevRowKey !== null && rowFingerprint === prevRowKey) {
+        continue;
+      }
+      prevRowKey = rowFingerprint;
+
+      result[city][fullDate] = dayData;
+    }
+  });
+  return result;
+}
+
+function mergeData(existing, newData) {
+  var merged = JSON.parse(JSON.stringify(existing));
+  // 动态合并所有城市数据（包括合计）
+  var allCityKeys = CITIES.concat(['合计']);
+  allCityKeys.forEach(function(city) {
+    if (!newData[city]) return;
+    if (!merged[city]) merged[city] = {};
+    Object.keys(newData[city]).forEach(function(date) {
+      merged[city][date] = newData[city][date];
+    });
+  });
+  // 保留所有渠道合计目标值
+  if (newData._totalTargets) {
+    merged._totalTargets = newData._totalTargets;
+  }
+  return merged;
+}
+
+function handleFile(file) {
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var result = parseExcel(e.target.result);
+      if (!result) return;
+      var totalDates = 0;
+      Object.keys(result).forEach(function(city) { totalDates = Math.max(totalDates, Object.keys(result[city]).length); });
+      if (totalDates === 0) { showToast('未识别到有效数据', 'error'); return; }
+      saveHistory(mergeData(loadHistory(), result));
+      showToast('✅ 导入成功！共 ' + totalDates + ' 天数据', 'success');
+      renderAll();
+    } catch (err) { showToast('解析失败: ' + err.message, 'error'); console.error(err); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ========== 拖拽绑定 ==========
+document.addEventListener('dragover', function(e) { e.preventDefault(); e.stopPropagation(); }, false);
+document.addEventListener('drop', function(e) { e.preventDefault(); e.stopPropagation(); }, false);
+var dropZone = document.getElementById('dropZone');
+var fileInput = document.getElementById('fileInput');
+dropZone.addEventListener('click', function() { fileInput.click(); });
+fileInput.addEventListener('change', function(e) { handleFile(e.target.files[0]); fileInput.value = ''; });
+dropZone.addEventListener('dragover', function(e) { e.preventDefault(); e.stopPropagation(); dropZone.classList.add('dragover'); }, false);
+dropZone.addEventListener('dragleave', function() { dropZone.classList.remove('dragover'); });
+dropZone.addEventListener('drop', function(e) {
+  e.preventDefault(); e.stopPropagation(); dropZone.classList.remove('dragover');
+  var f = e.dataTransfer.files[0];
+  if (f && (f.name.endsWith('.xlsx') || f.name.endsWith('.xls'))) handleFile(f);
+  else showToast('请拖入 .xlsx 文件', 'error');
+}, false);
+</script>
+
+<script>
+// ========== Tab切换 ==========
+var currentTab = 'overview';
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(function(btn) {
+    btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
+  });
+  document.querySelectorAll('.tab-content').forEach(function(el) {
+    el.classList.toggle('active', el.id === 'tab-' + tab);
+  });
+  setTimeout(function() {
+    allCharts.forEach(function(c) { c.resize(); });
+    // 重新绘制所有大括号
+    redrawAllBrackets();
+  }, 100);
+}
+
+// 存储每个图表的大括号参数，以便 resize/tab切换时重绘
+var bracketConfigs = [];
+function redrawAllBrackets() {
+  bracketConfigs.forEach(function(cfg) {
+    drawBracket(cfg.chart, cfg.timeLineIdx, cfg.timeProgPct, cfg.timeProgStr);
+  });
+}
+function drawBracket(chart, timeLineIdx, timeProgPct, timeProgStr) {
+  if (timeLineIdx < 0) return;
+  var xCenter = chart.convertToPixel({ xAxisIndex: 0 }, timeLineIdx);
+  if (!xCenter || isNaN(xCenter) || xCenter <= 0) return;
+  var barHalfW = 14;
+  if (timeLineIdx > 0) {
+    var xPrev = chart.convertToPixel({ xAxisIndex: 0 }, timeLineIdx - 1);
+    if (xPrev && !isNaN(xPrev)) barHalfW = (xCenter - xPrev) * 0.3;
+  }
+  var bracketX = xCenter + barHalfW + 6;
+  var bottomY = chart.convertToPixel({ yAxisIndex: 1 }, 0);
+  var topY = chart.convertToPixel({ yAxisIndex: 1 }, timeProgPct);
+  if (!bottomY || !topY || isNaN(bottomY) || isNaN(topY) || bottomY <= 0) return;
+  var bW = 8;
+  var midY = (topY + bottomY) / 2;
+  chart.setOption({
+    graphic: [{
+      type: 'group',
+      children: [
+        { type: 'line', shape: { x1: bracketX + bW, y1: topY, x2: bracketX, y2: topY }, style: { stroke: '#e84c3d', lineWidth: 2 } },
+        { type: 'line', shape: { x1: bracketX, y1: topY, x2: bracketX, y2: midY - 4 }, style: { stroke: '#e84c3d', lineWidth: 2 } },
+        { type: 'line', shape: { x1: bracketX, y1: midY - 4, x2: bracketX + bW + 2, y2: midY }, style: { stroke: '#e84c3d', lineWidth: 2 } },
+        { type: 'line', shape: { x1: bracketX + bW + 2, y1: midY, x2: bracketX, y2: midY + 4 }, style: { stroke: '#e84c3d', lineWidth: 2 } },
+        { type: 'line', shape: { x1: bracketX, y1: midY + 4, x2: bracketX, y2: bottomY }, style: { stroke: '#e84c3d', lineWidth: 2 } },
+        { type: 'line', shape: { x1: bracketX + bW, y1: bottomY, x2: bracketX, y2: bottomY }, style: { stroke: '#e84c3d', lineWidth: 2 } },
+        { type: 'text', style: { text: '⏱ 时间进度\n' + timeProgStr, x: bracketX + bW + 8, y: midY,
+            textAlign: 'left', textVerticalAlign: 'middle', fill: '#e84c3d', fontSize: 11, fontWeight: 'bold', lineHeight: 16 } }
+      ]
+    }]
+  });
+}
+
+// ========== 数据准备 ==========
+function prepareChartData(history) {
+  var result = {};
+  var yest = getYesterday();
+
+  // 当前数据月份的前缀，例如 "2026-05-"
+  var monthPrefix = DATA_YEAR + '-' + String(DATA_MONTH).padStart(2, '0') + '-';
+  // 计算T-1截止日期字符串，只展示到昨天的数据
+  var t1Date = monthPrefix + String(yest.day).padStart(2, '0');
+  // 如果当前月份和数据月份不同（比如今天是6/1，数据是5月的），则不截断，展示全部
+  var now = new Date();
+  var currentMonth = now.getMonth() + 1;
+  var currentYear = now.getFullYear();
+  var shouldCutoff = (DATA_MONTH === currentMonth && DATA_YEAR === currentYear);
+
+  // 时间进度：如果是当月则用T-1/总天数，如果是过去月份则100%
+  var timeProg;
+  if (shouldCutoff) {
+    timeProg = yest.day / MAY_DAYS;
+  } else {
+    timeProg = 1; // 月份已过，时间进度100%
+  }
+
+  // 处理每个城市（动态检测）
+  CITIES.forEach(function(city) {
+    var cityData = history[city];
+    if (!cityData) return;
+    // 只保留属于当前 DATA_MONTH 的日期（过滤掉其他月份残留数据）
+    var dates = Object.keys(cityData).filter(function(d) { return d.indexOf(monthPrefix) === 0; }).sort();
+    // 只保留T-1及之前的数据
+    if (shouldCutoff) {
+      dates = dates.filter(function(d) { return d <= t1Date; });
+    }
+    if (!dates.length) return;
+
+    // 计算总GMV（所有大类合计之和 = 站点合计+门店合计+渠道拓展合计+美团抖音合计+新媒体合计+私域合计）
+    var totalChannels = ['站点合计', '门店合计', '渠道拓展合计', '美团抖音合计', '新媒体合计', '私域合计'];
+    var gmvSeries = [];
+    // 优先从"所有渠道合计"目标设置中取总目标，否则从每日数据中累加
+    var targetVal = (history._totalTargets && history._totalTargets[city]) ? history._totalTargets[city] : 0;
+
+    dates.forEach(function(d) {
+      var dayData = cityData[d];
+      var totalGmv = 0, totalTarget = 0, hasData = false;
+      totalChannels.forEach(function(ch) {
+        var chData = dayData[ch];
+        if (chData && chData.value != null) { totalGmv += chData.value; hasData = true; }
+        if (chData && chData.target != null) totalTarget += chData.target;
+      });
+      if (hasData) {
+        // 达成率使用所有渠道合计目标值计算
+        var rateTarget = targetVal > 0 ? targetVal : totalTarget;
+        var totalRate = rateTarget > 0 ? totalGmv / rateTarget : null;
+        gmvSeries.push({ date: d, gmv: totalGmv, rate: totalRate, timeProg: dayData.timeProg });
+      }
+      // 如果没有从目标设置中取到，则从每日数据中取
+      if (targetVal === 0 && totalTarget > 0) targetVal = totalTarget;
+    });
+
+    // 各渠道汇总
+    var channelSummary = {};
+    var channelDaily = {};
+    ALL_CHANNELS.forEach(function(ch) {
+      channelDaily[ch] = [];
+      dates.forEach(function(d) {
+        var chData = cityData[d][ch];
+        if (chData) {
+          channelDaily[ch].push({ date: d, value: chData.value, target: chData.target, rate: chData.rate });
+        }
+      });
+      // 最新有数据的日期
+      var latestData = null;
+      for (var i = dates.length - 1; i >= 0; i--) {
+        var chd = cityData[dates[i]][ch];
+        if (chd && (chd.value != null || chd.target != null)) { latestData = chd; break; }
+      }
+      if (latestData) {
+        channelSummary[ch] = { value: latestData.value, target: latestData.target, rate: latestData.rate };
+      }
+    });
+
+    var latestGmv = gmvSeries.length > 0 ? gmvSeries[gmvSeries.length - 1] : {};
+    result[city] = {
+      gmvSeries: gmvSeries,
+      targetVal: targetVal,
+      totalRate: latestGmv.rate || null,
+      timeProg: timeProg,
+      latestDate: dates[dates.length - 1],
+      channelSummary: channelSummary,
+      channelDaily: channelDaily,
+      dates: dates
+    };
+  });
+
+  // ===== 总览：使用"合计"数据 =====
+  var hejiData = history['合计'];
+  if (hejiData) {
+    var hejiDates = Object.keys(hejiData).filter(function(d) { return d.indexOf(monthPrefix) === 0; }).sort();
+    // 只保留T-1及之前的数据
+    if (shouldCutoff) {
+      hejiDates = hejiDates.filter(function(d) { return d <= t1Date; });
+    }
+    if (hejiDates.length > 0) {
+      var totalChannels = ['站点合计', '门店合计', '渠道拓展合计', '美团抖音合计', '新媒体合计', '私域合计'];
+      var overviewGmvSeries = [];
+      // 优先从"所有渠道合计"目标设置中取总目标
+      var overviewTargetVal = (history._totalTargets && history._totalTargets['合计']) ? history._totalTargets['合计'] : 0;
+
+      hejiDates.forEach(function(d) {
+        var dayData = hejiData[d];
+        var totalGmv = 0, totalTarget = 0, hasData = false;
+        totalChannels.forEach(function(ch) {
+          var chData = dayData[ch];
+          if (chData && chData.value != null) { totalGmv += chData.value; hasData = true; }
+          if (chData && chData.target != null) totalTarget += chData.target;
+        });
+        if (hasData) {
+          var rateTarget = overviewTargetVal > 0 ? overviewTargetVal : totalTarget;
+          var totalRate = rateTarget > 0 ? totalGmv / rateTarget : null;
+          overviewGmvSeries.push({ date: d, gmv: totalGmv, rate: totalRate, timeProg: dayData.timeProg });
+        }
+        if (overviewTargetVal === 0 && totalTarget > 0) overviewTargetVal = totalTarget;
+      });
+
+      var overviewChannelSummary = {};
+      var overviewChannelDaily = {};
+      ALL_CHANNELS.forEach(function(ch) {
+        overviewChannelDaily[ch] = [];
+        hejiDates.forEach(function(d) {
+          var chData = hejiData[d][ch];
+          if (chData) {
+            overviewChannelDaily[ch].push({ date: d, value: chData.value, target: chData.target, rate: chData.rate });
+          }
+        });
+        var latestData = null;
+        for (var i = hejiDates.length - 1; i >= 0; i--) {
+          var chd = hejiData[hejiDates[i]][ch];
+          if (chd && (chd.value != null || chd.target != null)) { latestData = chd; break; }
+        }
+        if (latestData) {
+          overviewChannelSummary[ch] = { value: latestData.value, target: latestData.target, rate: latestData.rate };
+        }
+      });
+
+      var latestOverview = overviewGmvSeries.length > 0 ? overviewGmvSeries[overviewGmvSeries.length - 1] : {};
+      result['总览'] = {
+        gmvSeries: overviewGmvSeries,
+        targetVal: overviewTargetVal,
+        totalRate: latestOverview.rate || null,
+        timeProg: timeProg,
+        latestDate: hejiDates[hejiDates.length - 1],
+        channelSummary: overviewChannelSummary,
+        channelDaily: overviewChannelDaily,
+        dates: hejiDates
+      };
+    }
+  }
+
+  return result;
+}
+
+// ========== 渲染 ==========
+var allCharts = [];
+function renderAll() {
+  allCharts.forEach(function(c) { c.dispose(); });
+  allCharts = [];
+  bracketConfigs = []; // 清空大括号配置
+  var history = loadHistory();
+
+  // 自动检测数据中的月份和天数
+  detectMonthFromData(history);
+
+  // 动态更新页面标题
+  document.querySelector('.header h1').textContent = '📊 ' + DATA_MONTH + '月GMV目标达成率追踪';
+
+  document.getElementById('tab-overview').innerHTML = '';
+  // 如果当前tab不再有效，重置为overview
+  if (currentTab !== 'overview' && CITIES.indexOf(currentTab) < 0) {
+    currentTab = 'overview';
+  }
+  // 动态生成城市tab按钮和tab内容容器
+  var tabBar = document.getElementById('tabBar');
+  // 清除旧的城市tab按钮（保留overview按钮）
+  var existingBtns = tabBar.querySelectorAll('.tab-btn[data-tab]');
+  existingBtns.forEach(function(btn) {
+    if (btn.getAttribute('data-tab') !== 'overview') btn.remove();
+  });
+  // 更新overview按钮的active状态
+  tabBar.querySelector('.tab-btn[data-tab="overview"]').classList.toggle('active', currentTab === 'overview');
+  document.getElementById('tab-overview').classList.toggle('active', currentTab === 'overview');
+  // 清除旧的城市tab内容容器
+  document.querySelectorAll('.tab-content').forEach(function(el) {
+    if (el.id !== 'tab-overview') el.remove();
+  });
+  // 为每个检测到的城市创建tab按钮和内容容器
+  CITIES.forEach(function(city) {
+    var btn = document.createElement('button');
+    btn.className = 'tab-btn' + (currentTab === city ? ' active' : '');
+    btn.setAttribute('data-tab', city);
+    btn.setAttribute('onclick', "switchTab('" + city + "')");
+    btn.textContent = city;
+    tabBar.appendChild(btn);
+    
+    var tabDiv = document.createElement('div');
+    tabDiv.id = 'tab-' + city;
+    tabDiv.className = 'tab-content' + (currentTab === city ? ' active' : '');
+    document.getElementById('tab-overview').parentNode.insertBefore(tabDiv, document.querySelector('.note'));
+  });
+
+  document.getElementById('reportDate').textContent = '报告生成时间：' + new Date().toLocaleString('zh-CN') + '（数据截止T-1：' + DATA_YEAR + '-' + String(DATA_MONTH).padStart(2, '0') + '-' + String(getYesterday().day).padStart(2, '0') + '）';
+
+  // 统计已有数据天数
+  var allDatesSet = {};
+  CITIES.concat(['合计']).forEach(function(city) {
+    if (history[city]) Object.keys(history[city]).forEach(function(d) { allDatesSet[d] = true; });
+  });
+  var allDates = Object.keys(allDatesSet).sort();
+  document.getElementById('historyInfo').textContent = allDates.length
+    ? '已有 ' + allDates.length + ' 天数据（' + allDates[0] + ' ~ ' + allDates[allDates.length - 1] + '）'
+    : '暂无历史数据';
+
+  // 更新天气状态
+  var weather = loadWeather();
+  var weatherCities = Object.keys(weather);
+  var weatherDayCount = 0;
+  weatherCities.forEach(function(c) { weatherDayCount = Math.max(weatherDayCount, Object.keys(weather[c]).length); });
+  document.getElementById('weatherInfo').textContent = weatherDayCount > 0
+    ? '🌤️ 已有 ' + weatherDayCount + ' 天天气（' + weatherCities.join('、') + '）'
+    : '';
+
+  if (!allDates.length) return;
+  var chartData = prepareChartData(history);
+
+  // 渲染总览tab
+  if (chartData['总览']) {
+    var section = buildCitySection('总览', chartData['总览']);
+    document.getElementById('tab-overview').appendChild(section);
+    renderCityCharts('总览', chartData['总览']);
+  }
+
+  // 渲染各城市tab
+  CITIES.forEach(function(city) {
+    var d = chartData[city]; if (!d) return;
+    var section = buildCitySection(city, d, true);
+    document.getElementById('tab-' + city).appendChild(section);
+    renderCityCharts(city, d, true);
+  });
+
+  window.addEventListener('resize', function() {
+    allCharts.forEach(function(c) { c.resize(); });
+    setTimeout(redrawAllBrackets, 200);
+  });
+}
+
+function buildCitySection(city, d, isTab) {
+  var suffix = isTab ? '-tab' : '';
+  var displayName = city === '总览' ? (CITIES.length > 0 ? CITIES.join('+') + '合计' : '合计') : city;
+  var totalRateStr = d.totalRate != null ? (d.totalRate * 100).toFixed(1) + '%' : '-';
+  var timeProgStr = (d.timeProg * 100).toFixed(1) + '%';
+  var latestGMV = d.gmvSeries.length > 0 ? d.gmvSeries[d.gmvSeries.length - 1].gmv : 0;
+
+  // 计算T-1日收入和本月日均
+  var t1DailyGMV = 0;
+  if (d.gmvSeries.length >= 2) {
+    t1DailyGMV = d.gmvSeries[d.gmvSeries.length - 1].gmv - d.gmvSeries[d.gmvSeries.length - 2].gmv;
+  } else if (d.gmvSeries.length === 1) {
+    t1DailyGMV = d.gmvSeries[0].gmv;
+  }
+  var monthlyAvg = d.gmvSeries.length > 0 ? latestGMV / d.gmvSeries.length : 0;
+  var t1VsAvg = monthlyAvg > 0 ? ((t1DailyGMV - monthlyAvg) / monthlyAvg * 100).toFixed(1) : '0.0';
+  var t1VsAvgColor = '#fff';
+  var t1VsAvgSign = t1DailyGMV >= monthlyAvg ? '▲ +' : '▼ ';
+  var t1AbsDiff = t1DailyGMV - monthlyAvg;
+  var t1AbsSign = t1AbsDiff >= 0 ? '+' : '';
+  var t1VsAvgLabel = 'T-1日: ¥' + (t1DailyGMV / 10000).toFixed(2) + '万 vs 日均: ¥' + (monthlyAvg / 10000).toFixed(2) + '万';
+
+  // 达成率vs时间进度差值
+  var totalRatePct = d.totalRate != null ? (d.totalRate * 100).toFixed(1) : null;
+  var timeProgPct = (d.timeProg * 100).toFixed(1);
+  var diffVal = totalRatePct != null ? (d.totalRate * 100 - d.timeProg * 100).toFixed(1) : null;
+  var diffSign = diffVal != null && diffVal >= 0 ? '▲ +' : '▼ ';
+  var diffColor = '#fff';
+  var diffText = diffVal != null ? diffSign + diffVal + 'pp' : '-';
+
+  var section = document.createElement('div');
+  section.className = 'city-section';
+  var html = '<div class="city-title">' + displayName + '</div>' +
+    '<div class="kpi-row">' +
+    '<div class="kpi-card kpi-purple" style="position:relative"><div class="label">MTD累计GMV</div><div class="value">¥' + (latestGMV/10000).toFixed(1) + '万</div>' + (d.targetVal > 0 ? '<div style="position:absolute;bottom:10px;right:14px;font-size:15px;opacity:0.85">目标 ¥' + (d.targetVal/10000).toFixed(1) + '万</div>' : '') + '</div>' +
+    '<div class="kpi-card kpi-green" style="position:relative"><div class="label">T-1日营收</div><div class="value">¥' + (t1DailyGMV/10000).toFixed(2) + '万</div><div style="position:absolute;bottom:10px;right:14px;font-size:13px;opacity:0.9">' + t1VsAvgSign + t1VsAvg + '% vs 日均 ¥' + (monthlyAvg/10000).toFixed(2) + '万</div></div>' +
+    '<div class="kpi-card kpi-blue"><div class="label">达成率 ' + totalRateStr + ' vs 时间进度 ' + timeProgStr + '</div><div class="value" style="color:' + diffColor + '">' + diffText + '</div></div>' +
+    '</div>' +
+    '<div id="chart1-' + city + suffix + '" class="chart-box"></div>' +
+    '<div id="analysis1-' + city + suffix + '"></div>' +
+    '<div id="analysis2-' + city + suffix + '"></div>' +
+    '<div class="path-block"><h3 class="block-title">📋 全渠道汇总一览</h3><div id="table-consolidated-' + city + suffix + '"></div></div>';
+
+  // 为每个大类板块生成HTML
+  BLOCK_CONFIG.forEach(function(block) {
+    var blockId = block.name;
+    html += '<div class="path-block">' +
+      '<h3 class="block-title">' + block.icon + ' ' + block.name + '</h3>' +
+      '<div id="table-' + blockId + '-' + city + suffix + '"></div>' +
+      '<div id="bigchart-' + blockId + '-' + city + suffix + '" class="chart-box-tall"></div>';
+    if (block.paths.length > 0) {
+      html += '<div id="pathgrid-' + blockId + '-' + city + suffix + '" class="path-charts-grid"></div>';
+    }
+    html += '<div id="pathanalysis-' + blockId + '-' + city + suffix + '"></div>' +
+      '</div>';
+  });
+
+  // 总合计板块
+  html += '<div class="path-block">' +
+    '<h3 class="block-title">📊 全渠道合计</h3>' +
+    '<div id="table-grandtotal-' + city + suffix + '"></div>' +
+    '<div id="bigchart-grandtotal-' + city + suffix + '" class="chart-box"></div>' +
+    '</div>';
+
+  section.innerHTML = html;
+  return section;
+}
+
+function renderCityCharts(city, d, isTab) {
+  var suffix = isTab ? '-tab' : '';
+  var timeProgStr = (d.timeProg * 100).toFixed(1) + '%';
+
+  renderChart1(city, d, timeProgStr, suffix);
+  document.getElementById('analysis1-' + city + suffix).innerHTML = generateCityAnalysis(city, d);
+  document.getElementById('analysis2-' + city + suffix).innerHTML = generateTableAnalysis(city, d);
+
+  // 渲染全渠道汇总一览表
+  renderConsolidatedTable('table-consolidated-' + city + suffix, d);
+
+  // 渲染每个大类板块
+  BLOCK_CONFIG.forEach(function(block) {
+    var blockId = block.name;
+    var tablePaths = [block.totalPath].concat(block.paths);
+    // 构建显示名映射（totalPath / paths 均可有自定义显示名）
+    var displayNames = {};
+    if (block.displayTotalPath) displayNames[block.totalPath] = block.displayTotalPath;
+    if (block.displayPaths) Object.keys(block.displayPaths).forEach(function(k) { displayNames[k] = block.displayPaths[k]; });
+    renderBlockTable('table-' + blockId + '-' + city + suffix, d, tablePaths, displayNames);
+    renderBigPathChart('bigchart-' + blockId + '-' + city + suffix, d, block.totalPath, timeProgStr, city, block.displayTotalPath);
+    if (block.paths.length > 0) {
+      renderBlockPathCharts('pathgrid-' + blockId + '-' + city + suffix, d, block.paths, timeProgStr, city, block.displayPaths);
+    }
+    renderBlockPathAnalysis('pathanalysis-' + blockId + '-' + city + suffix, d, tablePaths, displayNames);
+  });
+
+  // 全渠道合计（用GMV series数据）
+  renderGrandTotalTable('table-grandtotal-' + city + suffix, d);
+  renderGrandTotalChart('bigchart-grandtotal-' + city + suffix, d, timeProgStr, city);
+}
+</script>
+
+<script>
+// ========== 图1：总GMV柱状图 + 达成率折线 + 每日营收子图 ==========
+function renderChart1(city, d, timeProgStr, suffix) {
+  suffix = suffix || '';
+  var displayName = city === '总览' ? (CITIES.length > 0 ? CITIES.join('+') + '合计' : '合计') : city;
+  var dom = document.getElementById('chart1-' + city + suffix);
+  var chart = echarts.init(dom, null, { devicePixelRatio: window.devicePixelRatio * 2 });
+  allCharts.push(chart);
+
+  var dataMap = {};
+  d.gmvSeries.forEach(function(x) { dataMap[x.date] = x; });
+  var allDates = generateAllDates();
+  var dateLabels = allDates.map(function(x) { return x.substring(5); });
+
+  var gmvs = allDates.map(function(x) { return dataMap[x] ? dataMap[x].gmv : null; });
+  var rates = allDates.map(function(x) { return dataMap[x] && dataMap[x].rate != null ? +(dataMap[x].rate * 100).toFixed(1) : null; });
+
+  // 计算每日营收（当天累计 - 前一天累计）
+  var dailyRevenues = [];
+  for (var di = 0; di < allDates.length; di++) {
+    if (gmvs[di] == null) { dailyRevenues.push(null); continue; }
+    if (di === 0 || gmvs[di - 1] == null) { dailyRevenues.push(gmvs[di]); }
+    else { dailyRevenues.push(gmvs[di] - gmvs[di - 1]); }
+  }
+
+  var targetVal = d.targetVal || 0;
+  var timeProgPct = +(d.timeProg * 100).toFixed(1);
+  var timeProgLine = allDates.map(function(x, i) { return +((i + 1) / MAY_DAYS * 100).toFixed(1); });
+
+  var maxRateVal = 100;
+  rates.forEach(function(r) { if (r != null && r > maxRateVal) maxRateVal = r; });
+  var rateAxisMax = Math.max(maxRateVal, timeProgPct) * 1.2;
+  rateAxisMax = Math.ceil(rateAxisMax / 10) * 10;
+  if (rateAxisMax < 110) rateAxisMax = 110;
+
+  // 每日营收的月均线
+  var validDailyRevs = dailyRevenues.filter(function(v) { return v != null; });
+  var dailyAvg = validDailyRevs.length > 0 ? validDailyRevs.reduce(function(a, b) { return a + b; }, 0) / validDailyRevs.length : 0;
+
+  var yest = getYesterday();
+  var timeLineIdx = -1;
+  for (var ti = gmvs.length - 1; ti >= 0; ti--) {
+    if (gmvs[ti] != null) { timeLineIdx = ti; break; }
+  }
+  if (timeLineIdx < 0) {
+    for (var ti = 0; ti < allDates.length; ti++) {
+      var dayNum = ti + 1;
+      if (dayNum === yest.day) { timeLineIdx = ti; break; }
+    }
+  }
+
+  var latestRate = null;
+  for (var ri = rates.length - 1; ri >= 0; ri--) {
+    if (rates[ri] != null) { latestRate = rates[ri]; break; }
+  }
+  var diffBadge = '', diffBadgeColor = '#555';
+  if (latestRate != null) {
+    var diffVal = (latestRate - timeProgPct).toFixed(1);
+    if (diffVal >= 0) { diffBadge = '▲ 达成率领先时间进度 +' + diffVal + 'pp'; diffBadgeColor = '#52c41a'; }
+    else { diffBadge = '▼ 达成率落后时间进度 ' + diffVal + 'pp'; diffBadgeColor = '#ff4d4f'; }
+  }
+
+  var option = {
+    title: [
+      { text: displayName + ' — ' + DATA_MONTH + '月GMV目标达成情况', textStyle: { fontSize: 16, color: '#333', fontWeight: 'bold' }, left: 'center', top: 5 },
+      { text: diffBadge, textStyle: { fontSize: 12, color: diffBadgeColor, fontWeight: 'bold' }, left: 'center', top: 55 }
+    ],
+    tooltip: {
+      trigger: 'axis', backgroundColor: 'rgba(255,255,255,0.96)', borderColor: '#ddd', borderWidth: 1, textStyle: { color: '#333', fontSize: 12 },
+      formatter: function(params) {
+        var idx = params[0].dataIndex;
+        var gv = gmvs[idx], dv = dailyRevenues[idx], av = rates[idx];
+        var wDay = idx + 1;
+        var s = '<b>' + allDates[idx] + '</b>';
+        if (city !== '总览') {
+          var wText = getWeatherText(city, wDay);
+          if (wText) s += ' ' + weatherIcon(wText) + ' ' + wText;
+        }
+        s += '<br/>';
+        s += '📊 累计GMV: ' + (gv != null ? '¥' + (gv / 10000).toFixed(2) + '万' : '-') + '<br/>';
+        s += '💰 当日营收: ' + (dv != null ? '¥' + (dv / 10000).toFixed(2) + '万' : '-') + '<br/>';
+        s += '<span style="color:#9254de">🎯 目标: ¥' + (targetVal / 10000).toFixed(2) + '万</span><br/>';
+        s += '<span style="color:#333">📈 达成率: ' + (av != null ? av + '%' : '-') + '</span>';
+        return s;
+      }
+    },
+    axisPointer: { link: [{ xAxisIndex: 'all' }] },
+    legend: { data: ['MTD累计GMV', '目标', '达成率', '时间进度', '每日营收', '日均'], top: 30, textStyle: { fontSize: 11 } },
+    grid: [
+      { left: 80, right: 120, top: 95, bottom: '38%' },
+      { left: 80, right: 120, top: '76%', bottom: 50 }
+    ],
+    xAxis: [
+      { type: 'category', data: dateLabels, boundaryGap: true, gridIndex: 0,
+        axisLabel: { fontSize: 9, interval: 0, rotate: 45, rich: { date: { fontSize: 9, color: '#555' }, holiday: { fontSize: 9, color: '#ff4d4f', fontWeight: 'bold' } }, formatter: function(value, index) { var day = index + 1; return isHoliday(day) ? '{holiday|' + value + ' ★}' : '{date|' + value + '}'; } },
+        axisLine: { lineStyle: { color: '#999' } } },
+      { type: 'category', data: dateLabels, boundaryGap: true, gridIndex: 1,
+        axisLabel: { fontSize: 9, interval: 0, rotate: 45,
+          rich: { date: { fontSize: 9, color: '#555' }, holiday: { fontSize: 9, color: '#ff4d4f', fontWeight: 'bold' }, weather: { fontSize: 8, color: '#888' }, rain: { fontSize: 8, color: '#1890ff', fontWeight: 'bold' } },
+          formatter: function(value, index) { var day = index + 1; var w = getWeatherLabel(city, day); var dateStyle = isHoliday(day) ? '{holiday|' + value + ' ★}' : '{date|' + value + '}'; if (!w) return dateStyle; var wStyle = isRainyWeather(w) ? '{rain|' + w + '}' : '{weather|' + w + '}'; return dateStyle + '\n' + wStyle; } },
+        axisLine: { lineStyle: { color: '#999' } } }
+    ],
+    yAxis: [
+      { type: 'value', name: 'GMV（万元）', position: 'left', gridIndex: 0,
+        nameTextStyle: { fontSize: 12, color: '#555' },
+        axisLabel: { formatter: function(v) { return (v / 10000).toFixed(0); }, fontSize: 11, color: '#555' },
+        axisLine: { show: true, lineStyle: { color: '#89b4f8' } }, splitLine: { lineStyle: { color: '#f0f0f0' } } },
+      { type: 'value', name: '达成率 %', position: 'right', min: 0, max: rateAxisMax, gridIndex: 0,
+        nameTextStyle: { fontSize: 12, color: '#555' },
+        axisLabel: { formatter: '{value}%', fontSize: 11, color: '#555' },
+        axisLine: { show: true, lineStyle: { color: '#c41d7f' } }, splitLine: { show: false } },
+      { type: 'value', name: '日营收（万元）', position: 'left', gridIndex: 1,
+        nameTextStyle: { fontSize: 10, color: '#666' },
+        nameLocation: 'end', nameGap: 12,
+        axisLabel: { formatter: function(v) { return (v / 10000).toFixed(1); }, fontSize: 10, color: '#666' },
+        axisLine: { show: true, lineStyle: { color: '#61cdaa' } }, splitLine: { lineStyle: { color: '#f5f5f5' } } }
+    ],
+    series: [
+      { name: 'MTD累计GMV', type: 'bar', xAxisIndex: 0, yAxisIndex: 0, data: gmvs, barMaxWidth: 28,
+        itemStyle: { color: '#89b4f8', borderRadius: [3, 3, 0, 0] },
+        label: { show: true, position: 'inside', fontSize: 9, color: '#fff', fontWeight: 'bold',
+          formatter: function(p) { return p.value != null ? (p.value / 10000).toFixed(1) : ''; } } },
+      { name: '目标', type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: allDates.map(function() { return targetVal; }),
+        lineStyle: { type: 'dashed', width: 2, color: '#a461d8' }, symbol: 'none', itemStyle: { color: '#a461d8' },
+        markPoint: { symbol: 'pin', symbolSize: 1, data: [{ coord: [dateLabels.length - 1, targetVal],
+          label: { show: true, formatter: '目标: ¥' + (targetVal / 10000).toFixed(1) + '万', position: 'left', fontSize: 10, color: '#a461d8', fontWeight: 'bold', backgroundColor: 'rgba(255,255,255,0.85)', padding: [2, 6] }, itemStyle: { color: 'transparent' } }] } },
+      { name: '达成率', type: 'line', xAxisIndex: 0, yAxisIndex: 1, data: rates, connectNulls: true, smooth: true,
+        symbol: 'circle', symbolSize: 6, lineStyle: { width: 2.5, color: '#c41d7f' }, itemStyle: { color: '#c41d7f' },
+        label: { show: true, formatter: function(p) { return p.value != null ? p.value + '%' : ''; }, position: 'top', fontSize: 10, color: '#c41d7f', fontWeight: 'bold' } },
+      { name: '时间进度', type: 'line', xAxisIndex: 0, yAxisIndex: 1, data: timeProgLine,
+        lineStyle: { type: [8, 4], width: 1.5, color: '#e84c3d' }, symbol: 'none', itemStyle: { color: '#e84c3d' } },
+      { name: '每日营收', type: 'bar', xAxisIndex: 1, yAxisIndex: 2, data: dailyRevenues, barMaxWidth: 20,
+        itemStyle: { color: function(params) { return params.value != null && params.value >= dailyAvg ? '#61cdaa' : '#c8e6c0'; }, borderRadius: [2, 2, 0, 0] },
+        color: '#61cdaa',
+        label: { show: true, position: 'top', fontSize: 8, color: '#555',
+          formatter: function(p) { return p.value != null ? (p.value / 10000).toFixed(1) : ''; } } },
+      { name: '日均', type: 'line', xAxisIndex: 1, yAxisIndex: 2, data: allDates.map(function() { return dailyAvg; }),
+        lineStyle: { type: 'dashed', width: 1.5, color: '#e8684a' }, symbol: 'none', itemStyle: { color: '#e8684a' },
+        markPoint: { symbol: 'pin', symbolSize: 1, data: [{ coord: [dateLabels.length - 1, dailyAvg],
+          label: { show: true, formatter: '日均: ¥' + (dailyAvg / 10000).toFixed(2) + '万', position: [5, -20], fontSize: 10, color: '#e8684a', fontWeight: 'bold', backgroundColor: 'rgba(255,255,255,0.85)', padding: [2, 6] }, itemStyle: { color: 'transparent' } }] } }
+    ]
+  };
+  chart.setOption(option);
+
+  // 竖直大括号 - 注册并延迟绘制
+  if (timeLineIdx >= 0) {
+    bracketConfigs.push({ chart: chart, timeLineIdx: timeLineIdx, timeProgPct: timeProgPct, timeProgStr: timeProgStr });
+    setTimeout(function() {
+      drawBracket(chart, timeLineIdx, timeProgPct, timeProgStr);
+    }, 500);
+  }
+}
+
+// ========== 分板块表格 ==========
+function renderBlockTable(containerId, d, channelNames, displayNames) {
+  displayNames = displayNames || {};
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  var timeProg = d.timeProg;
+  var filtered = [];
+  channelNames.forEach(function(ch) {
+    var s = d.channelSummary[ch];
+    if (s) filtered.push({ name: ch, value: s.value, target: s.target, rate: s.rate });
+  });
+  if (!filtered.length) { container.innerHTML = ''; return; }
+
+  var html = '<table class="summary-table">';
+  html += '<thead><tr><th>渠道</th><th>月度目标</th><th>MTD累计</th><th>达成率</th><th>达成进度 vs 时间进度（时间进度' + (timeProg * 100).toFixed(1) + '%）</th></tr></thead><tbody>';
+  filtered.forEach(function(p) {
+    var chTimeProg = getChannelTimeProg(p.name, timeProg);
+    var chTimeProgPct = chTimeProg * 100;
+    var isSpecialTimeProg = Math.abs(chTimeProg - timeProg) > 0.001;
+    var rc = rateClass(p.rate, chTimeProg);
+    var rateStr = p.rate != null ? (p.rate * 100).toFixed(1) + '%' : '-';
+    var targetStr = p.target != null ? '¥' + (p.target / 10000).toFixed(2) + '万' : '-';
+    var currentStr = p.value != null ? '¥' + (p.value / 10000).toFixed(2) + '万' : '-';
+    var ratePct = p.rate != null ? Math.min(p.rate * 100, 100) : 0;
+    var barColor = ratePct >= chTimeProgPct ? '#52c41a' : (ratePct >= chTimeProgPct * 0.8 ? '#faad14' : '#ff4d4f');
+    var timeLabel = isSpecialTimeProg ? '<div style="position:relative;height:15px;min-width:120px;margin-bottom:2px"><span style="position:absolute;left:' + chTimeProgPct + '%;transform:translateX(-50%);font-size:9px;color:#e84c3d;font-weight:bold;white-space:nowrap">⏱' + chTimeProgPct.toFixed(1) + '%</span></div>' : '';
+    var progressBar = timeLabel + '<div style="position:relative;height:20px;background:#f0f0f0;border-radius:10px;overflow:hidden;min-width:120px">' +
+      '<div style="width:' + ratePct + '%;height:100%;background:' + barColor + ';border-radius:10px;transition:width .5s"></div>' +
+      '<div style="position:absolute;left:' + chTimeProgPct + '%;top:0;height:100%;width:2px;background:#333" title="时间进度' + chTimeProgPct.toFixed(1) + '%"></div>' +
+      '<span style="position:absolute;left:4px;top:1px;font-size:10px;color:#333;font-weight:bold">' + rateStr + '</span></div>';
+    var isTotal = p.name.indexOf('合计') >= 0;
+    var rowStyle = isTotal ? ' style="background:#f8f9fb;font-weight:600"' : '';
+    var displayName = displayNames[p.name] || p.name;
+    html += '<tr' + rowStyle + '><td>' + displayName + '</td><td>' + targetStr + '</td><td>' + currentStr + '</td><td class="' + rc + '">' + rateStr + '</td><td>' + progressBar + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+// ========== 全渠道合计表格 ==========
+function renderGrandTotalTable(containerId, d) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  var timeProg = d.timeProg;
+  var totalChannels = ['站点合计', '门店合计', '渠道拓展合计', '美团抖音合计', '新媒体合计', '私域合计'];
+  var filtered = [];
+  var grandValue = 0, grandTarget = 0, hasGrand = false;
+  totalChannels.forEach(function(ch) {
+    var s = d.channelSummary[ch];
+    if (s) {
+      filtered.push({ name: ch, value: s.value, target: s.target, rate: s.rate });
+      if (s.value != null) { grandValue += s.value; hasGrand = true; }
+      if (s.target != null) grandTarget += s.target;
+    }
+  });
+  if (hasGrand) {
+    filtered.unshift({ name: '全渠道合计', value: grandValue, target: grandTarget, rate: grandTarget > 0 ? grandValue / grandTarget : null });
+  }
+  if (!filtered.length) { container.innerHTML = ''; return; }
+
+  var html = '<table class="summary-table">';
+  html += '<thead><tr><th>渠道大类</th><th>月度目标</th><th>MTD累计</th><th>达成率</th><th>达成进度 vs 时间进度（时间进度' + (timeProg * 100).toFixed(1) + '%）</th></tr></thead><tbody>';
+  filtered.forEach(function(p) {
+    var rc = rateClass(p.rate, timeProg);
+    var rateStr = p.rate != null ? (p.rate * 100).toFixed(1) + '%' : '-';
+    var targetStr = p.target != null ? '¥' + (p.target / 10000).toFixed(2) + '万' : '-';
+    var currentStr = p.value != null ? '¥' + (p.value / 10000).toFixed(2) + '万' : '-';
+    var ratePct = p.rate != null ? Math.min(p.rate * 100, 100) : 0;
+    var timeProgPct = timeProg * 100;
+    var barColor = ratePct >= timeProgPct ? '#52c41a' : (ratePct >= timeProgPct * 0.8 ? '#faad14' : '#ff4d4f');
+    var progressBar = '<div style="position:relative;height:20px;background:#f0f0f0;border-radius:10px;overflow:hidden;min-width:120px">' +
+      '<div style="width:' + ratePct + '%;height:100%;background:' + barColor + ';border-radius:10px;transition:width .5s"></div>' +
+      '<div style="position:absolute;left:' + timeProgPct + '%;top:0;height:100%;width:2px;background:#333" title="时间进度' + timeProgPct.toFixed(1) + '%"></div>' +
+      '<span style="position:absolute;left:4px;top:1px;font-size:10px;color:#333;font-weight:bold">' + rateStr + '</span></div>';
+    var isGrand = p.name === '全渠道合计';
+    var rowStyle = isGrand ? ' style="background:#e8f4fd;font-weight:700"' : ' style="background:#f8f9fb;font-weight:600"';
+    html += '<tr' + rowStyle + '><td>' + p.name + '</td><td>' + targetStr + '</td><td>' + currentStr + '</td><td class="' + rc + '">' + rateStr + '</td><td>' + progressBar + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+// ========== 全渠道汇总一览表（所有板块合并） ==========
+function renderConsolidatedTable(containerId, d) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  var timeProg = d.timeProg;
+  var timeProgPct = timeProg * 100;
+
+  var html = '<table class="summary-table">';
+  html += '<thead><tr><th>渠道</th><th>月度目标</th><th>MTD累计</th><th>达成率</th><th>达成进度 vs 时间进度（时间进度' + timeProgPct.toFixed(1) + '%）</th></tr></thead><tbody>';
+
+  BLOCK_CONFIG.forEach(function(block) {
+    // 大类合计行
+    var totalData = d.channelSummary[block.totalPath];
+    if (totalData) {
+      var rc = rateClass(totalData.rate, timeProg);
+      var rateStr = totalData.rate != null ? (totalData.rate * 100).toFixed(1) + '%' : '-';
+      var targetStr = totalData.target != null ? '¥' + (totalData.target / 10000).toFixed(2) + '万' : '-';
+      var currentStr = totalData.value != null ? '¥' + (totalData.value / 10000).toFixed(2) + '万' : '-';
+      var ratePct = totalData.rate != null ? Math.min(totalData.rate * 100, 100) : 0;
+      var barColor = ratePct >= timeProgPct ? '#52c41a' : (ratePct >= timeProgPct * 0.8 ? '#faad14' : '#ff4d4f');
+      var progressBar = '<div style="position:relative;height:20px;background:#f0f0f0;border-radius:10px;overflow:hidden;min-width:120px">' +
+        '<div style="width:' + ratePct + '%;height:100%;background:' + barColor + ';border-radius:10px;transition:width .5s"></div>' +
+        '<div style="position:absolute;left:' + timeProgPct + '%;top:0;height:100%;width:2px;background:#333" title="时间进度' + timeProgPct.toFixed(1) + '%"></div>' +
+        '<span style="position:absolute;left:4px;top:1px;font-size:10px;color:#333;font-weight:bold">' + rateStr + '</span></div>';
+      html += '<tr style="background:#f0f4ff;font-weight:700"><td style="text-align:left;padding-left:12px">' + block.icon + ' ' + (block.displayTotalPath || block.totalPath) + '</td><td>' + targetStr + '</td><td>' + currentStr + '</td><td class="' + rc + '">' + rateStr + '</td><td>' + progressBar + '</td></tr>';
+    }
+
+    // 细分渠道行
+    block.paths.forEach(function(ch) {
+      var s = d.channelSummary[ch];
+      if (!s) return;
+      var chTimeProg = getChannelTimeProg(ch, timeProg);
+      var chTimeProgPct = chTimeProg * 100;
+      var isSpecialTimeProg = Math.abs(chTimeProg - timeProg) > 0.001;
+      var rc = rateClass(s.rate, chTimeProg);
+      var rateStr = s.rate != null ? (s.rate * 100).toFixed(1) + '%' : '-';
+      var targetStr = s.target != null ? '¥' + (s.target / 10000).toFixed(2) + '万' : '-';
+      var currentStr = s.value != null ? '¥' + (s.value / 10000).toFixed(2) + '万' : '-';
+      var ratePct = s.rate != null ? Math.min(s.rate * 100, 100) : 0;
+      var barColor = ratePct >= chTimeProgPct ? '#52c41a' : (ratePct >= chTimeProgPct * 0.8 ? '#faad14' : '#ff4d4f');
+      var timeLabelHtml = isSpecialTimeProg ? '<div style="position:relative;height:15px;min-width:120px;margin-bottom:2px"><span style="position:absolute;left:' + chTimeProgPct + '%;transform:translateX(-50%);font-size:9px;color:#e84c3d;font-weight:bold;white-space:nowrap">⏱' + chTimeProgPct.toFixed(1) + '%</span></div>' : '';
+      var progressBar = timeLabelHtml + '<div style="position:relative;height:20px;background:#f0f0f0;border-radius:10px;overflow:hidden;min-width:120px">' +
+        '<div style="width:' + ratePct + '%;height:100%;background:' + barColor + ';border-radius:10px;transition:width .5s"></div>' +
+        '<div style="position:absolute;left:' + chTimeProgPct + '%;top:0;height:100%;width:2px;background:#333" title="时间进度' + chTimeProgPct.toFixed(1) + '%"></div>' +
+        '<span style="position:absolute;left:4px;top:1px;font-size:10px;color:#333;font-weight:bold">' + rateStr + '</span></div>';
+      html += '<tr><td style="text-align:center;padding-left:28px">' + ((block.displayPaths && block.displayPaths[ch]) || ch) + '</td><td>' + targetStr + '</td><td>' + currentStr + '</td><td class="' + rc + '">' + rateStr + '</td><td>' + progressBar + '</td></tr>';
+    });
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+</script>
+
+<script>
+// ========== 分板块路径小图 ==========
+function renderBlockPathCharts(gridId, d, channelNames, timeProgStr, city, displayPaths) {
+  city = city || '';
+  displayPaths = displayPaths || {};
+  var grid = document.getElementById(gridId);
+  if (!grid) return;
+  var timeProgPct = +(d.timeProg * 100).toFixed(1);
+  var yest = getYesterday();
+
+  channelNames.forEach(function(ch) {
+    var pData = d.channelDaily[ch] || [];
+    if (!pData.some(function(x) { return x.value != null; })) return;
+    var div = document.createElement('div');
+    div.className = 'path-chart-item';
+    grid.appendChild(div);
+    var chart = echarts.init(div, null, { devicePixelRatio: window.devicePixelRatio * 2 });
+    allCharts.push(chart);
+
+    var allDates = generateAllDates();
+    var dateLabels = allDates.map(function(x) { return x.substring(5); });
+    var pMap = {};
+    pData.forEach(function(x) { pMap[x.date] = x; });
+    var revenues = allDates.map(function(x) { return pMap[x] ? pMap[x].value : null; });
+    var rates = allDates.map(function(x) { return pMap[x] && pMap[x].rate != null ? +(pMap[x].rate * 100).toFixed(1) : null; });
+    var targetVal = pData.length > 0 && pData[0].target ? pData[0].target : null;
+
+    var timeProgLine = allDates.map(function(x, i) {
+      // 五一地推使用特殊时间进度：基于五一假期天数
+      if (ch === '五一地推' && DATA_MONTH === 5) {
+        var holidays = HOLIDAYS_MANUAL[5] || {};
+        var wuyiDays = Object.keys(holidays).map(Number).sort(function(a,b){return a-b;});
+        if (wuyiDays.length > 0) {
+          var day = i + 1;
+          var firstDay = wuyiDays[0];
+          var lastDay = wuyiDays[wuyiDays.length - 1];
+          if (day < firstDay) return 0;
+          if (day >= lastDay) return 100;
+          var elapsed = day - firstDay + 1;
+          return +(elapsed / wuyiDays.length * 100).toFixed(1);
+        }
+      }
+      return +((i + 1) / MAY_DAYS * 100).toFixed(1);
+    });
+    var maxRate = 100;
+    rates.forEach(function(r) { if (r != null && r > maxRate) maxRate = r; });
+    var yAxisMax = Math.max(maxRate, timeProgPct) * 1.3;
+    yAxisMax = Math.ceil(yAxisMax / 10) * 10;
+    if (yAxisMax < 110) yAxisMax = 110;
+
+    var opt = {
+      title: { text: displayPaths[ch] || ch, textStyle: { fontSize: 14, color: '#333' }, left: 'center', top: 5 },
+      tooltip: { trigger: 'axis', formatter: function(params) {
+        var idx = params[0].dataIndex; var rv = null, rt = null;
+        params.forEach(function(p) { if (p.seriesName === '累计收入') rv = p.value; if (p.seriesName === '达成率') rt = p.value; });
+        var wDay = idx + 1;
+        var s = '<b>' + allDates[idx] + '</b>';
+        if (city !== '总览') { var wText = getWeatherText(city, wDay); if (wText) s += ' ' + weatherIcon(wText) + ' ' + wText; }
+        s += '<br/>💰 累计收入: ' + (rv != null ? '¥' + (rv / 10000).toFixed(2) + '万' : '-') + '<br/>';
+        if (targetVal) s += '🎯 目标: ¥' + (targetVal / 10000).toFixed(2) + '万<br/>';
+        s += '📈 达成率: ' + (rt != null ? rt + '%' : '-'); return s;
+      } },
+      legend: { data: ['累计收入', '达成率', '时间进度'], top: 28, textStyle: { fontSize: 10 } },
+      grid: { left: 65, right: 55, top: 60, bottom: 60 },
+      xAxis: { type: 'category', data: dateLabels, boundaryGap: true, axisLabel: { fontSize: 9, interval: 0, rotate: 45, rich: { date: { fontSize: 9, color: '#666' }, holiday: { fontSize: 9, color: '#ff4d4f', fontWeight: 'bold' }, weather: { fontSize: 8, color: '#888' }, rain: { fontSize: 8, color: '#1890ff', fontWeight: 'bold' } }, formatter: function(value, index) { var day = index + 1; var w = getWeatherLabel(city, day); var dateStyle = isHoliday(day) ? '{holiday|' + value + '★}' : '{date|' + value + '}'; if (!w) return dateStyle; var wStyle = isRainyWeather(w) ? '{rain|' + w + '}' : '{weather|' + w + '}'; return dateStyle + '\n' + wStyle; } }, axisLine: { lineStyle: { color: '#ccc' } } },
+      yAxis: [
+        { type: 'value', name: '收入（万元）', nameTextStyle: { fontSize: 11, color: '#666' },
+          axisLabel: { formatter: function(v) { return (v / 10000).toFixed(0); }, fontSize: 10, color: '#666' },
+          axisLine: { show: true, lineStyle: { color: '#89b4f8' } }, splitLine: { lineStyle: { color: '#f5f5f5' } } },
+        { type: 'value', name: '%', min: 0, max: yAxisMax, nameTextStyle: { fontSize: 11, color: '#666' },
+          axisLabel: { formatter: '{value}%', fontSize: 10, color: '#666' },
+          axisLine: { show: true, lineStyle: { color: '#c41d7f' } }, splitLine: { show: false } }
+      ],
+      series: [
+        { name: '累计收入', type: 'bar', yAxisIndex: 0, data: revenues, barMaxWidth: 18,
+          itemStyle: { color: '#89b4f8', borderRadius: [2, 2, 0, 0] },
+          label: { show: true, position: 'inside', fontSize: 8, color: '#fff', fontWeight: 'bold',
+            formatter: function(p) { return p.value != null ? (p.value / 10000).toFixed(1) : ''; } } },
+        { name: '达成率', type: 'line', yAxisIndex: 1, data: rates, connectNulls: true, smooth: true,
+          symbol: 'circle', symbolSize: 6, lineStyle: { width: 2.5, color: '#c41d7f' }, itemStyle: { color: '#c41d7f' },
+          label: { show: true, formatter: function(p) { return p.value != null ? p.value + '%' : ''; }, position: 'top', fontSize: 10, color: '#c41d7f', fontWeight: 'bold' } },
+        { name: '时间进度', type: 'line', yAxisIndex: 1, data: timeProgLine,
+          lineStyle: { type: [8, 4], width: 1.5, color: '#e84c3d' }, symbol: 'none', itemStyle: { color: '#e84c3d' } }
+      ]
+    };
+    if (targetVal) {
+      opt.series.push({ name: '目标', type: 'line', yAxisIndex: 0, data: allDates.map(function() { return targetVal; }),
+        lineStyle: { type: 'dashed', width: 1.5, color: '#a461d8' }, symbol: 'none', itemStyle: { color: '#a461d8' } });
+      opt.legend.data.push('目标');
+    }
+    chart.setOption(opt);
+
+    // 竖直大括号 - 紧贴最后一个有数据的柱子右边
+    var timeLineIdx = -1;
+    for (var ti = revenues.length - 1; ti >= 0; ti--) {
+      if (revenues[ti] != null) { timeLineIdx = ti; break; }
+    }
+    if (timeLineIdx < 0) {
+      for (var ti = 0; ti < allDates.length; ti++) {
+        if (ti + 1 === yest.day) { timeLineIdx = ti; break; }
+      }
+    }
+    if (timeLineIdx >= 0) {
+      // 五一地推使用特殊时间进度
+      var chTimeProgPctForBracket = timeProgPct;
+      var chTimeProgStrForBracket = timeProgStr;
+      if (ch === '五一地推' && DATA_MONTH === 5) {
+        var wuyiProg = getWuyiTimeProg();
+        if (wuyiProg !== null) {
+          chTimeProgPctForBracket = +(wuyiProg * 100).toFixed(1);
+          chTimeProgStrForBracket = chTimeProgPctForBracket + '%';
+        }
+      }
+      bracketConfigs.push({ chart: chart, timeLineIdx: timeLineIdx, timeProgPct: chTimeProgPctForBracket, timeProgStr: chTimeProgStrForBracket });
+      (function(theChart, theTimeLineIdx, theTimeProgPct, theTimeProgStr) {
+        setTimeout(function() {
+          drawBracket(theChart, theTimeLineIdx, theTimeProgPct, theTimeProgStr);
+        }, 500);
+      })(chart, timeLineIdx, chTimeProgPctForBracket, chTimeProgStrForBracket);
+    }
+  });
+}
+
+// ========== 分板块路径分析文字 ==========
+function renderBlockPathAnalysis(containerId, d, channelNames, displayNames) {
+  displayNames = displayNames || {};
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  var html = '';
+  channelNames.forEach(function(ch) {
+    var pData = d.channelDaily[ch] || [];
+    if (pData.some(function(x) { return x.value != null; })) {
+      var chTimeProg = getChannelTimeProg(ch, d.timeProg);
+      html += generatePathAnalysis(displayNames[ch] || ch, pData, chTimeProg);
+    }
+  });
+  container.innerHTML = html;
+}
+
+// ========== 大尺寸路径图 ==========
+function renderBigPathChart(domId, d, channelName, timeProgStr, city, displayName) {
+  city = city || '';
+  displayName = displayName || channelName;
+  var dom = document.getElementById(domId);
+  if (!dom) return;
+  var pData = d.channelDaily[channelName] || [];
+  if (!pData.some(function(x) { return x.value != null; })) { dom.style.display = 'none'; return; }
+
+  var chart = echarts.init(dom, null, { devicePixelRatio: window.devicePixelRatio * 2 });
+  allCharts.push(chart);
+  // 五一地推使用特殊时间进度
+  var chTimeProg = getChannelTimeProg(channelName, d.timeProg);
+  var timeProgPct = +(chTimeProg * 100).toFixed(1);
+  var chTimeProgStr = timeProgPct + '%';
+  var yest = getYesterday();
+
+  var allDates = generateAllDates();
+  var dateLabels = allDates.map(function(x) { return x.substring(5); });
+  var pMap = {};
+  pData.forEach(function(x) { pMap[x.date] = x; });
+  var revenues = allDates.map(function(x) { return pMap[x] ? pMap[x].value : null; });
+  var rates = allDates.map(function(x) { return pMap[x] && pMap[x].rate != null ? +(pMap[x].rate * 100).toFixed(1) : null; });
+  var targetVal = pData.length > 0 && pData[0].target ? pData[0].target : null;
+  var timeProgLine = allDates.map(function(x, i) {
+    // 五一地推使用特殊时间进度线
+    if (channelName === '五一地推' && DATA_MONTH === 5) {
+      var holidays = HOLIDAYS_MANUAL[5] || {};
+      var wuyiDays = Object.keys(holidays).map(Number).sort(function(a,b){return a-b;});
+      if (wuyiDays.length > 0) {
+        var day = i + 1;
+        var firstDay = wuyiDays[0];
+        var lastDay = wuyiDays[wuyiDays.length - 1];
+        if (day < firstDay) return 0;
+        if (day >= lastDay) return 100;
+        var elapsed = day - firstDay + 1;
+        return +(elapsed / wuyiDays.length * 100).toFixed(1);
+      }
+    }
+    return +((i + 1) / MAY_DAYS * 100).toFixed(1);
+  });
+
+  var maxRate = 100;
+  rates.forEach(function(r) { if (r != null && r > maxRate) maxRate = r; });
+  var rateAxisMax = Math.max(maxRate, timeProgPct) * 1.2;
+  rateAxisMax = Math.ceil(rateAxisMax / 10) * 10;
+  if (rateAxisMax < 110) rateAxisMax = 110;
+
+  var latestRate = null;
+  for (var ri = rates.length - 1; ri >= 0; ri--) {
+    if (rates[ri] != null) { latestRate = rates[ri]; break; }
+  }
+  var diffBadge = '', diffBadgeColor = '#555';
+  if (latestRate != null) {
+    var diffVal = (latestRate - timeProgPct).toFixed(1);
+    if (diffVal >= 0) { diffBadge = '▲ 达成率领先时间进度 +' + diffVal + 'pp'; diffBadgeColor = '#52c41a'; }
+    else { diffBadge = '▼ 达成率落后时间进度 ' + diffVal + 'pp'; diffBadgeColor = '#ff4d4f'; }
+  }
+
+  // 计算每日营收（当天累计 - 前一天累计）
+  var dailyRevenues = [];
+  for (var di = 0; di < allDates.length; di++) {
+    if (revenues[di] == null) { dailyRevenues.push(null); continue; }
+    if (di === 0 || revenues[di - 1] == null) { dailyRevenues.push(revenues[di]); }
+    else { dailyRevenues.push(revenues[di] - revenues[di - 1]); }
+  }
+  // 日均线
+  var validDailyRevs = dailyRevenues.filter(function(v) { return v != null; });
+  var dailyAvg = validDailyRevs.length > 0 ? validDailyRevs.reduce(function(a, b) { return a + b; }, 0) / validDailyRevs.length : 0;
+
+  var xAxisLabelConfig = {
+    fontSize: 10, interval: 0, rotate: 45,
+    rich: { date: { fontSize: 10, color: '#555' }, holiday: { fontSize: 10, color: '#ff4d4f', fontWeight: 'bold' }, weather: { fontSize: 9, color: '#888' }, rain: { fontSize: 9, color: '#1890ff', fontWeight: 'bold' } },
+    formatter: function(value, index) {
+      var day = index + 1; var w = getWeatherLabel(city, day);
+      var dateStyle = isHoliday(day) ? '{holiday|' + value + ' ★}' : '{date|' + value + '}';
+      if (!w) return dateStyle;
+      var wStyle = isRainyWeather(w) ? '{rain|' + w + '}' : '{weather|' + w + '}';
+      return dateStyle + '\n' + wStyle;
+    }
+  };
+
+  var option = {
+    title: [
+      { text: displayName + ' — 累计收入与达成率', textStyle: { fontSize: 16, color: '#333', fontWeight: 'bold' }, left: 'center', top: 5 },
+      { text: diffBadge, textStyle: { fontSize: 12, color: diffBadgeColor, fontWeight: 'bold' }, left: 'center', top: 55 }
+    ],
+    tooltip: {
+      trigger: 'axis', backgroundColor: 'rgba(255,255,255,0.96)', borderColor: '#ddd', borderWidth: 1, textStyle: { color: '#333', fontSize: 12 },
+      axisPointer: { link: [{ xAxisIndex: 'all' }] },
+      formatter: function(params) {
+        var idx = params[0].dataIndex; var rv = null, rt = null, dv = null;
+        params.forEach(function(p) {
+          if (p.seriesName === '累计收入') rv = p.value;
+          if (p.seriesName === '达成率') rt = p.value;
+          if (p.seriesName === '每日营收') dv = p.value;
+        });
+        var wDay = idx + 1;
+        var s = '<b>' + allDates[idx] + '</b>';
+        if (city !== '总览') { var wText = getWeatherText(city, wDay); if (wText) s += ' ' + weatherIcon(wText) + ' ' + wText; }
+        s += '<br/>📊 累计收入: ' + (rv != null ? '¥' + (rv / 10000).toFixed(2) + '万' : '-') + '<br/>';
+        s += '💰 当日营收: ' + (dv != null ? '¥' + (dv / 10000).toFixed(2) + '万' : '-') + '<br/>';
+        if (targetVal) s += '🎯 目标: ¥' + (targetVal / 10000).toFixed(2) + '万<br/>';
+        s += '📈 达成率: ' + (rt != null ? rt + '%' : '-'); return s;
+      }
+    },
+    axisPointer: { link: [{ xAxisIndex: 'all' }] },
+    legend: { data: ['累计收入', '达成率', '时间进度', '每日营收', '日均'], top: 30, textStyle: { fontSize: 11 } },
+    grid: [
+      { left: 80, right: 120, top: 95, bottom: '42%' },
+      { left: 80, right: 120, top: '68%', bottom: 55 }
+    ],
+    xAxis: [
+      { type: 'category', data: dateLabels, boundaryGap: true, gridIndex: 0,
+        axisLabel: { fontSize: 9, interval: 0, rotate: 45, rich: { date: { fontSize: 9, color: '#555' }, holiday: { fontSize: 9, color: '#ff4d4f', fontWeight: 'bold' } }, formatter: function(value, index) { var day = index + 1; return isHoliday(day) ? '{holiday|' + value + ' ★}' : '{date|' + value + '}'; } },
+        axisLine: { lineStyle: { color: '#999' } } },
+      { type: 'category', data: dateLabels, boundaryGap: true, gridIndex: 1,
+        axisLabel: xAxisLabelConfig,
+        axisLine: { lineStyle: { color: '#999' } } }
+    ],
+    yAxis: [
+      { type: 'value', name: 'GMV（万元）', position: 'left', gridIndex: 0, nameTextStyle: { fontSize: 12, color: '#555' },
+        axisLabel: { formatter: function(v) { return (v / 10000).toFixed(0); }, fontSize: 11, color: '#555' },
+        axisLine: { show: true, lineStyle: { color: '#89b4f8' } }, splitLine: { lineStyle: { color: '#f0f0f0' } } },
+      { type: 'value', name: '达成率 %', position: 'right', min: 0, max: rateAxisMax, gridIndex: 0,
+        nameTextStyle: { fontSize: 12, color: '#555' },
+        axisLabel: { formatter: '{value}%', fontSize: 11, color: '#555' },
+        axisLine: { show: true, lineStyle: { color: '#c41d7f' } }, splitLine: { show: false } },
+      { type: 'value', name: '日营收（万元）', position: 'left', gridIndex: 1,
+        nameTextStyle: { fontSize: 10, color: '#666' }, nameLocation: 'end', nameGap: 12,
+        axisLabel: { formatter: function(v) { return (v / 10000).toFixed(1); }, fontSize: 10, color: '#666' },
+        axisLine: { show: true, lineStyle: { color: '#61cdaa' } }, splitLine: { lineStyle: { color: '#f5f5f5' } } }
+    ],
+    series: [
+      { name: '累计收入', type: 'bar', xAxisIndex: 0, yAxisIndex: 0, data: revenues, barMaxWidth: 28,
+        itemStyle: { color: '#89b4f8', borderRadius: [3, 3, 0, 0] },
+        label: { show: true, position: 'inside', fontSize: 9, color: '#fff', fontWeight: 'bold',
+          formatter: function(p) { return p.value != null ? (p.value / 10000).toFixed(1) : ''; } } },
+      { name: '达成率', type: 'line', xAxisIndex: 0, yAxisIndex: 1, data: rates, connectNulls: true, smooth: true,
+        symbol: 'circle', symbolSize: 6, lineStyle: { width: 2.5, color: '#c41d7f' }, itemStyle: { color: '#c41d7f' },
+        label: { show: true, formatter: function(p) { return p.value != null ? p.value + '%' : ''; }, position: 'top', fontSize: 10, color: '#c41d7f', fontWeight: 'bold' } },
+      { name: '时间进度', type: 'line', xAxisIndex: 0, yAxisIndex: 1, data: timeProgLine,
+        lineStyle: { type: [8, 4], width: 1.5, color: '#e84c3d' }, symbol: 'none', itemStyle: { color: '#e84c3d' } },
+      { name: '每日营收', type: 'bar', xAxisIndex: 1, yAxisIndex: 2, data: dailyRevenues, barMaxWidth: 20,
+        itemStyle: { color: function(params) { return params.value != null && params.value >= dailyAvg ? '#61cdaa' : '#c8e6c0'; }, borderRadius: [2, 2, 0, 0] },
+        label: { show: true, position: 'top', fontSize: 8, color: '#555',
+          formatter: function(p) { return p.value != null ? (p.value / 10000).toFixed(1) : ''; } } },
+      { name: '日均', type: 'line', xAxisIndex: 1, yAxisIndex: 2, data: allDates.map(function() { return dailyAvg; }),
+        lineStyle: { type: 'dashed', width: 1.5, color: '#e8684a' }, symbol: 'none', itemStyle: { color: '#e8684a' },
+        markPoint: { symbol: 'pin', symbolSize: 1, data: [{ coord: [dateLabels.length - 1, dailyAvg],
+          label: { show: true, formatter: '日均: ¥' + (dailyAvg / 10000).toFixed(2) + '万', position: [5, -20], fontSize: 10, color: '#e8684a', fontWeight: 'bold', backgroundColor: 'rgba(255,255,255,0.85)', padding: [2, 6] }, itemStyle: { color: 'transparent' } }] } }
+    ]
+  };
+  if (targetVal) {
+    option.series.push({ name: '目标', type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: allDates.map(function() { return targetVal; }),
+      lineStyle: { type: 'dashed', width: 2, color: '#a461d8' }, symbol: 'none', itemStyle: { color: '#a461d8' },
+      markPoint: { symbol: 'pin', symbolSize: 1, data: [{ coord: [dateLabels.length - 1, targetVal],
+        label: { show: true, formatter: '目标: ¥' + (targetVal / 10000).toFixed(1) + '万', position: 'left', fontSize: 10, color: '#a461d8', fontWeight: 'bold', backgroundColor: 'rgba(255,255,255,0.85)', padding: [2, 6] }, itemStyle: { color: 'transparent' } }] } });
+    option.legend.data.push('目标');
+  }
+  chart.setOption(option);
+
+  // 竖直大括号 - 紧贴最后一个有数据的柱子右边
+  var timeLineIdx = -1;
+  for (var ti = revenues.length - 1; ti >= 0; ti--) {
+    if (revenues[ti] != null) { timeLineIdx = ti; break; }
+  }
+  if (timeLineIdx < 0) {
+    for (var ti = 0; ti < allDates.length; ti++) {
+      if (ti + 1 === yest.day) { timeLineIdx = ti; break; }
+    }
+  }
+  if (timeLineIdx >= 0) {
+    bracketConfigs.push({ chart: chart, timeLineIdx: timeLineIdx, timeProgPct: timeProgPct, timeProgStr: chTimeProgStr });
+    setTimeout(function() {
+      drawBracket(chart, timeLineIdx, timeProgPct, chTimeProgStr);
+    }, 500);
+  }
+}
+
+// ========== 全渠道合计大图 ==========
+function renderGrandTotalChart(domId, d, timeProgStr, city) {
+  // 直接复用 gmvSeries 数据
+  var dom = document.getElementById(domId);
+  if (!dom) return;
+  if (!d.gmvSeries.length) { dom.style.display = 'none'; return; }
+
+  var chart = echarts.init(dom, null, { devicePixelRatio: window.devicePixelRatio * 2 });
+  allCharts.push(chart);
+  var timeProgPct = +(d.timeProg * 100).toFixed(1);
+  var yest = getYesterday();
+  var displayName = city === '总览' ? (CITIES.length > 0 ? CITIES.join('+') + '合计' : '合计') : city;
+
+  var allDates = generateAllDates();
+  var dateLabels = allDates.map(function(x) { return x.substring(5); });
+  var dataMap = {};
+  d.gmvSeries.forEach(function(x) { dataMap[x.date] = x; });
+  var gmvs = allDates.map(function(x) { return dataMap[x] ? dataMap[x].gmv : null; });
+  var rates = allDates.map(function(x) { return dataMap[x] && dataMap[x].rate != null ? +(dataMap[x].rate * 100).toFixed(1) : null; });
+  var targetVal = d.targetVal || 0;
+  var timeProgLine = allDates.map(function(x, i) { return +((i + 1) / MAY_DAYS * 100).toFixed(1); });
+
+  var maxRate = 100;
+  rates.forEach(function(r) { if (r != null && r > maxRate) maxRate = r; });
+  var rateAxisMax = Math.max(maxRate, timeProgPct) * 1.2;
+  rateAxisMax = Math.ceil(rateAxisMax / 10) * 10;
+  if (rateAxisMax < 110) rateAxisMax = 110;
+
+  var latestRate = null;
+  for (var ri = rates.length - 1; ri >= 0; ri--) {
+    if (rates[ri] != null) { latestRate = rates[ri]; break; }
+  }
+  var diffBadge = '', diffBadgeColor = '#555';
+  if (latestRate != null) {
+    var diffVal = (latestRate - timeProgPct).toFixed(1);
+    if (diffVal >= 0) { diffBadge = '▲ 达成率领先时间进度 +' + diffVal + 'pp'; diffBadgeColor = '#52c41a'; }
+    else { diffBadge = '▼ 达成率落后时间进度 ' + diffVal + 'pp'; diffBadgeColor = '#ff4d4f'; }
+  }
+
+  var option = {
+    title: [
+      { text: displayName + ' 全渠道合计 — 累计GMV与达成率', textStyle: { fontSize: 16, color: '#333', fontWeight: 'bold' }, left: 'center', top: 5 },
+      { text: diffBadge, textStyle: { fontSize: 12, color: diffBadgeColor, fontWeight: 'bold' }, left: 'center', top: 55 }
+    ],
+    tooltip: {
+      trigger: 'axis', backgroundColor: 'rgba(255,255,255,0.96)', borderColor: '#ddd', borderWidth: 1, textStyle: { color: '#333', fontSize: 12 },
+      formatter: function(params) {
+        var idx = params[0].dataIndex; var gv = null, rt = null;
+        params.forEach(function(p) { if (p.seriesName === '累计GMV') gv = p.value; if (p.seriesName === '达成率') rt = p.value; });
+        var wDay = idx + 1;
+        var s = '<b>' + allDates[idx] + '</b>';
+        if (city !== '总览') { var wText = getWeatherText(city, wDay); if (wText) s += ' ' + weatherIcon(wText) + ' ' + wText; }
+        s += '<br/>📊 累计GMV: ' + (gv != null ? '¥' + (gv / 10000).toFixed(2) + '万' : '-') + '<br/>';
+        s += '🎯 目标: ¥' + (targetVal / 10000).toFixed(2) + '万<br/>';
+        s += '📈 达成率: ' + (rt != null ? rt + '%' : '-'); return s;
+      }
+    },
+    legend: { data: ['累计GMV', '达成率', '时间进度', '目标'], top: 30, textStyle: { fontSize: 11 } },
+    grid: { left: 80, right: 120, top: 95, bottom: 75 },
+    xAxis: { type: 'category', data: dateLabels, boundaryGap: true, axisLabel: { fontSize: 10, interval: 0, rotate: 45, rich: { date: { fontSize: 10, color: '#555' }, holiday: { fontSize: 10, color: '#ff4d4f', fontWeight: 'bold' }, weather: { fontSize: 9, color: '#888' }, rain: { fontSize: 9, color: '#1890ff', fontWeight: 'bold' } }, formatter: function(value, index) { var day = index + 1; var w = getWeatherLabel(city, day); var dateStyle = isHoliday(day) ? '{holiday|' + value + ' ★}' : '{date|' + value + '}'; if (!w) return dateStyle; var wStyle = isRainyWeather(w) ? '{rain|' + w + '}' : '{weather|' + w + '}'; return dateStyle + '\n' + wStyle; } }, axisLine: { lineStyle: { color: '#999' } } },
+    yAxis: [
+      { type: 'value', name: 'GMV（万元）', position: 'left', nameTextStyle: { fontSize: 12, color: '#555' },
+        axisLabel: { formatter: function(v) { return (v / 10000).toFixed(0); }, fontSize: 11, color: '#555' },
+        axisLine: { show: true, lineStyle: { color: '#89b4f8' } }, splitLine: { lineStyle: { color: '#f0f0f0' } } },
+      { type: 'value', name: '达成率 %', position: 'right', min: 0, max: rateAxisMax,
+        nameTextStyle: { fontSize: 12, color: '#555' },
+        axisLabel: { formatter: '{value}%', fontSize: 11, color: '#555' },
+        axisLine: { show: true, lineStyle: { color: '#c41d7f' } }, splitLine: { show: false } }
+    ],
+    series: [
+      { name: '累计GMV', type: 'bar', yAxisIndex: 0, data: gmvs, barMaxWidth: 28,
+        itemStyle: { color: '#89b4f8', borderRadius: [3, 3, 0, 0] },
+        label: { show: true, position: 'inside', fontSize: 9, color: '#fff', fontWeight: 'bold',
+          formatter: function(p) { return p.value != null ? (p.value / 10000).toFixed(1) : ''; } } },
+      { name: '目标', type: 'line', yAxisIndex: 0, data: allDates.map(function() { return targetVal; }),
+        lineStyle: { type: 'dashed', width: 2, color: '#a461d8' }, symbol: 'none', itemStyle: { color: '#a461d8' } },
+      { name: '达成率', type: 'line', yAxisIndex: 1, data: rates, connectNulls: true, smooth: true,
+        symbol: 'circle', symbolSize: 6, lineStyle: { width: 2.5, color: '#c41d7f' }, itemStyle: { color: '#c41d7f' },
+        label: { show: true, formatter: function(p) { return p.value != null ? p.value + '%' : ''; }, position: 'top', fontSize: 10, color: '#c41d7f', fontWeight: 'bold' } },
+      { name: '时间进度', type: 'line', yAxisIndex: 1, data: timeProgLine,
+        lineStyle: { type: [8, 4], width: 1.5, color: '#e84c3d' }, symbol: 'none', itemStyle: { color: '#e84c3d' } }
+    ]
+  };
+  chart.setOption(option);
+}
+</script>
+
+<script>
+// ========== 分析文字生成 ==========
+function generateCityAnalysis(city, d) {
+  if (!d || !d.gmvSeries.length) return '';
+  var displayName = city === '总览' ? (CITIES.length > 0 ? CITIES.join('+') + '合计' : '合计') : city;
+  var latest = d.gmvSeries[d.gmvSeries.length - 1];
+  var latestGMV = latest.gmv;
+  var totalRate = d.totalRate;
+  var timeProg = d.timeProg;
+  var targetVal = d.targetVal || 0;
+  var timeProgPct = (timeProg * 100).toFixed(1);
+  var totalRatePct = totalRate != null ? (totalRate * 100).toFixed(1) : null;
+  var gap = targetVal - latestGMV;
+  var yest = getYesterday();
+  var remainDays = MAY_DAYS - yest.day;
+  var dailyNeeded = remainDays > 0 ? gap / remainDays : 0;
+
+  var recentGrowths = [];
+  for (var i = d.gmvSeries.length - 1; i >= 1 && recentGrowths.length < 3; i--) {
+    var prev = d.gmvSeries[i - 1].gmv;
+    var curr = d.gmvSeries[i].gmv;
+    if (prev != null && curr != null && prev > 0) {
+      recentGrowths.push(curr - prev);
+    }
+  }
+  var avgDailyGrowth = recentGrowths.length > 0 ? recentGrowths.reduce(function(a, b) { return a + b; }, 0) / recentGrowths.length : 0;
+
+  var html = '<div class="analysis-box">';
+  html += '<div class="analysis-title">📝 ' + displayName + ' GMV整体分析</div>';
+  html += '<ul>';
+
+  if (totalRatePct != null) {
+    var diff = (totalRate - timeProg) * 100;
+    if (diff >= 0) {
+      html += '<li>截至最新数据日，' + displayName + '累计GMV为 <span class="highlight-info">¥' + (latestGMV / 10000).toFixed(2) + '万</span>，达成率 <span class="highlight-good">' + totalRatePct + '%</span>，<span class="highlight-good">领先</span>时间进度（' + timeProgPct + '%）<span class="highlight-good">' + diff.toFixed(1) + '个百分点</span>，整体节奏良好。</li>';
+    } else {
+      html += '<li>截至最新数据日，' + displayName + '累计GMV为 <span class="highlight-info">¥' + (latestGMV / 10000).toFixed(2) + '万</span>，达成率 <span class="highlight-bad">' + totalRatePct + '%</span>，<span class="highlight-bad">落后</span>时间进度（' + timeProgPct + '%）<span class="highlight-bad">' + Math.abs(diff).toFixed(1) + '个百分点</span>，需加快推进。</li>';
+    }
+  }
+
+  if (targetVal > 0 && gap > 0) {
+    html += '<li>距目标（¥' + (targetVal / 10000).toFixed(2) + '万）还差 <span class="highlight-warn">¥' + (gap / 10000).toFixed(2) + '万</span>，剩余 ' + remainDays + ' 天，日均需完成 <span class="highlight-warn">¥' + (dailyNeeded / 10000).toFixed(2) + '万</span>。</li>';
+  } else if (gap <= 0) {
+    html += '<li>🎉 已达成目标（¥' + (targetVal / 10000).toFixed(2) + '万），超额完成 <span class="highlight-good">¥' + (Math.abs(gap) / 10000).toFixed(2) + '万</span>。</li>';
+  }
+
+  if (avgDailyGrowth > 0) {
+    html += '<li>近期日均增长约 <span class="highlight-info">¥' + (avgDailyGrowth / 10000).toFixed(2) + '万</span>';
+    if (gap > 0 && remainDays > 0) {
+      if (avgDailyGrowth >= dailyNeeded) {
+        html += '，按当前增速<span class="highlight-good">有望达成目标</span>。';
+      } else {
+        var shortfall = ((dailyNeeded - avgDailyGrowth) / 10000).toFixed(2);
+        html += '，距所需日均增速还差 <span class="highlight-bad">¥' + shortfall + '万/天</span>，需提升增长动力。';
+      }
+    }
+    html += '</li>';
+  }
+
+  html += '</ul></div>';
+  return html;
+}
+
+function generateTableAnalysis(city, d) {
+  if (!d || !Object.keys(d.channelSummary).length) return '';
+  var displayName = city === '总览' ? (CITIES.length > 0 ? CITIES.join('+') + '合计' : '合计') : city;
+  var timeProg = d.timeProg;
+
+  // 分析各大类合计的达成情况
+  var totalChannels = ['站点合计', '门店合计', '渠道拓展合计', '美团抖音合计', '新媒体合计', '私域合计'];
+  var good = [], warn = [], bad = [], noData = [];
+
+  totalChannels.forEach(function(ch) {
+    var s = d.channelSummary[ch];
+    if (!s || s.rate == null) { noData.push(ch); return; }
+    var ratePct = s.rate * 100;
+    var timeProgPct = timeProg * 100;
+    if (ratePct >= timeProgPct) good.push({ name: ch, rate: s.rate });
+    else if (ratePct >= timeProgPct * 0.8) warn.push({ name: ch, rate: s.rate });
+    else bad.push({ name: ch, rate: s.rate });
+  });
+
+  var html = '<div class="analysis-box">';
+  html += '<div class="analysis-title">📊 ' + displayName + ' 各大类达成情况分析</div>';
+  html += '<ul>';
+
+  if (good.length > 0) {
+    html += '<li><span class="highlight-good">表现优秀（达成率≥时间进度）：</span>' + good.map(function(p) {
+      return p.name + '（' + (p.rate * 100).toFixed(1) + '%）';
+    }).join('、') + '。';
+    var best = good.reduce(function(a, b) { return (a.rate || 0) > (b.rate || 0) ? a : b; });
+    html += '其中 <span class="highlight-good">' + best.name + '</span> 达成率最高。</li>';
+  }
+
+  if (warn.length > 0) {
+    html += '<li><span class="highlight-warn">需关注（达成率接近时间进度）：</span>' + warn.map(function(p) {
+      return p.name + '（' + (p.rate * 100).toFixed(1) + '%）';
+    }).join('、') + '，建议加大投入力度。</li>';
+  }
+
+  if (bad.length > 0) {
+    html += '<li><span class="highlight-bad">明显落后（达成率远低于时间进度）：</span>' + bad.map(function(p) {
+      return p.name + '（' + (p.rate * 100).toFixed(1) + '%）';
+    }).join('、') + '，需重点关注并制定追赶计划。</li>';
+  }
+
+  if (noData.length > 0) {
+    html += '<li>暂无数据或目标为0的大类：' + noData.join('、') + '。</li>';
+  }
+
+  // 站点 vs 线上对比
+  var zhandian = d.channelSummary['站点合计'];
+  var meituan = d.channelSummary['美团抖音合计'];
+  if (zhandian && meituan && zhandian.rate != null && meituan.rate != null) {
+    if (zhandian.rate > meituan.rate) {
+      html += '<li>站点达成率（' + (zhandian.rate * 100).toFixed(1) + '%）<span class="highlight-good">高于</span>美团抖音（' + (meituan.rate * 100).toFixed(1) + '%），站点渠道表现更强。</li>';
+    } else {
+      html += '<li>美团抖音达成率（' + (meituan.rate * 100).toFixed(1) + '%）<span class="highlight-good">高于</span>站点（' + (zhandian.rate * 100).toFixed(1) + '%），线上渠道表现更强。</li>';
+    }
+  }
+
+  html += '</ul></div>';
+  return html;
+}
+
+function generatePathAnalysis(ch, pData, timeProg) {
+  if (!pData || pData.length < 2) return '';
+  var latest = pData[pData.length - 1];
+  if (latest.value == null) return '';
+
+  var ratePct = latest.rate != null ? (latest.rate * 100).toFixed(1) : null;
+  var timeProgPct = (timeProg * 100).toFixed(1);
+
+  var recentGrowths = [];
+  for (var i = pData.length - 1; i >= 1 && recentGrowths.length < 3; i--) {
+    if (pData[i].value != null && pData[i - 1].value != null) {
+      recentGrowths.push(pData[i].value - pData[i - 1].value);
+    }
+  }
+  var avgGrowth = recentGrowths.length > 0 ? recentGrowths.reduce(function(a, b) { return a + b; }, 0) / recentGrowths.length : 0;
+
+  var html = '<div class="path-analysis-box">';
+  html += '📌 <b>' + ch + '</b>：';
+
+  if (ratePct != null) {
+    var diff = latest.rate - timeProg;
+    if (diff >= 0) {
+      html += '达成率 <span style="color:#52c41a;font-weight:bold">' + ratePct + '%</span>，领先时间进度 ' + (diff * 100).toFixed(1) + ' 个百分点。';
+    } else {
+      html += '达成率 <span style="color:#ff4d4f;font-weight:bold">' + ratePct + '%</span>，落后时间进度 ' + Math.abs(diff * 100).toFixed(1) + ' 个百分点。';
+    }
+  }
+
+  html += '累计收入 ¥' + (latest.value / 10000).toFixed(2) + '万';
+  if (latest.target) {
+    var remaining = latest.target - latest.value;
+    if (remaining > 0) {
+      html += '，距目标还差 ¥' + (remaining / 10000).toFixed(2) + '万';
+    } else {
+      html += '，已超额完成目标';
+    }
+  }
+  html += '。';
+
+  if (avgGrowth > 0) {
+    html += '近期日均增长约 ¥' + (avgGrowth / 10000).toFixed(2) + '万。';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+// 初始渲染
+renderAll();
+</script>
+</body>
+</html>
+
